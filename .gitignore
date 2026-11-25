@@ -46,3 +46,4 @@ ingestion/oaugf_extracted/
 .dev.vars
 .wrangler/
 .cloudflare/
+worker-configuration.d.ts
