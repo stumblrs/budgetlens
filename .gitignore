@@ -35,6 +35,7 @@ htmlcov/
 public/datasets/
 data_archive/
 ingestion/checkpoints_data/
+ingestion/ingestion_registry.json
 ingestion/staging/
 ingestion/oaugf_extracted/
 
