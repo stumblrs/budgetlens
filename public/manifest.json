@@ -1,0 +1,80 @@
+{
+  "id": "/",
+  "short_name": "BudgetLens",
+  "name": "BudgetLens — Nigerian Budget Transparency & Evidence Engine",
+  "scope": "/",
+  "start_url": "/",
+  "background_color": "#0d131d",
+  "theme_color": "#091017",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "description": "Search, verify, and analyze official Nigerian budget allocations with reproducible evidence.",
+  "categories": ["finance", "civic", "government", "news"],
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Citizen Tax & Area",
+      "short_name": "Citizen Hub",
+      "description": "Inspect personal tax receipts and neighborhood budget allocations",
+      "url": "/?tab=citizen",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Capital Projects",
+      "short_name": "Projects",
+      "description": "Search and filter capital budget schedules",
+      "url": "/?tab=projects",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Evidence Engine",
+      "short_name": "Forensics",
+      "description": "Inspect 22 forensic audit & cross-ledger rules",
+      "url": "/?tab=evidence",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "OAuGF Audit Queries",
+      "short_name": "OAuGF",
+      "description": "Review Auditor-General statutory audit findings",
+      "url": "/?tab=oaugf",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

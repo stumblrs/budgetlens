@@ -1,0 +1,966 @@
+{
+  "source": "https://oaugf.ng/26/publications/reports",
+  "listing": "https://oaugf.ng/26/media/com_jamegafilter/en_gb/2.json",
+  "fetched_at": "2026-11-22T18:58:47+00:00",
+  "count": 45,
+  "documents": [
+    {
+      "id": 1,
+      "title": "Annual Report 2012",
+      "description": "Annual Report of the Auditor-General for the Federation on the Accounts of the Federation of Nigeria...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2012"
+      ],
+      "tags": [
+        "2012"
+      ],
+      "published_date": null,
+      "site_download_count": 2181,
+      "page_url": "https://oaugf.ng/26/docman/1-annual-report-2012",
+      "url": "https://oaugf.ng/26/docman/1-annual-report-2012/file",
+      "slug": "1-annual-report-2012",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\1-annual-report-2012.pdf",
+      "size_bytes": 55666960,
+      "sha256": "c5f8b20ad3f82900080bdf951fcd58b2dbd1f88aee694472d942ee46b5dd2563",
+      "status": "downloaded"
+    },
+    {
+      "id": 2,
+      "title": "Annual Report 2013",
+      "description": "Annual Report of the Auditor-General for the Federation on the Accounts of the Federation of Nigeria...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2013"
+      ],
+      "tags": [
+        "2013"
+      ],
+      "published_date": null,
+      "site_download_count": 2628,
+      "page_url": "https://oaugf.ng/26/docman/2-annual-report-2013",
+      "url": "https://oaugf.ng/26/docman/2-annual-report-2013/file",
+      "slug": "2-annual-report-2013",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\2-annual-report-2013.pdf",
+      "size_bytes": 18864600,
+      "sha256": "ca290e775f0d93676bcd291511ddd4f7118eef789d8a501f47003628f1e2f8cd",
+      "status": "downloaded"
+    },
+    {
+      "id": 3,
+      "title": "Annual Report 2014",
+      "description": "Annual Report of the Auditor-General for the Federation on the Accounts of the Federation of Nigeria...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2014"
+      ],
+      "tags": [
+        "2014"
+      ],
+      "published_date": null,
+      "site_download_count": 3003,
+      "page_url": "https://oaugf.ng/26/docman/3-annual-report-2014",
+      "url": "https://oaugf.ng/26/docman/3-annual-report-2014/file",
+      "slug": "3-annual-report-2014",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\3-annual-report-2014.pdf",
+      "size_bytes": 9241374,
+      "sha256": "c75df5922c7eaf44be74f1b3eb9555623e9e4eaabb8aee4467c7ef0b70e4646d",
+      "status": "downloaded"
+    },
+    {
+      "id": 4,
+      "title": "Annual Report 2015 (Pt 2)",
+      "description": "Annual Report of the Auditor-General for the Federation on the Accounts of the Federation of Nigeria...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2015"
+      ],
+      "tags": [
+        "2015"
+      ],
+      "published_date": null,
+      "site_download_count": 3019,
+      "page_url": "https://oaugf.ng/26/docman/4-annual-report-2015-pt-1",
+      "url": "https://oaugf.ng/26/docman/4-annual-report-2015-pt-1/file",
+      "slug": "4-annual-report-2015-pt-1",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/4-annual-report-)"
+    },
+    {
+      "id": 5,
+      "title": "Annual Report 2015 (Pt 1)",
+      "description": "Annual Report of the Auditor-General for the Federation on the Accounts of the Federation of Nigeria...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2015"
+      ],
+      "tags": [
+        "2015"
+      ],
+      "published_date": null,
+      "site_download_count": 4264,
+      "page_url": "https://oaugf.ng/26/docman/5-annual-report-2015-pt-1-1",
+      "url": "https://oaugf.ng/26/docman/5-annual-report-2015-pt-1-1/file",
+      "slug": "5-annual-report-2015-pt-1-1",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/5-annual-report-)"
+    },
+    {
+      "id": 6,
+      "title": "Linkage and Access of MSMEs to Sources of Finance and other Resources by SMEDAN",
+      "description": "This Performance Audit on the linkage and access of Micro, Small and Medium Enterprises (MSMEs) to s...",
+      "category": "Performance Audit",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": 787,
+      "page_url": "https://oaugf.ng/26/docman/6-linkage-and-access-of-msmes-to-sources-of-finance-and-other-resources-by-smedan",
+      "url": "https://oaugf.ng/26/docman/6-linkage-and-access-of-msmes-to-sources-of-finance-and-other-resources-by-smedan/file",
+      "slug": "6-linkage-and-access-of-msmes-to-sources-of-finance-and-other-resources-by-smedan",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\6-linkage-and-access-of-msmes-to-sources-of-finance-and-other-resources-by-smedan.pdf",
+      "size_bytes": 377308224,
+      "sha256": "64841f53e0cbd866418620d44eff194879098a3c6e0a3b346846296350d46ca1",
+      "status": "downloaded"
+    },
+    {
+      "id": 7,
+      "title": "Annual Report 2016",
+      "description": "I am required by Section 85 (5) of the Constitution of the Federal Republic of Nigeria 1999 (as amen...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2016"
+      ],
+      "tags": [
+        "2016"
+      ],
+      "published_date": null,
+      "site_download_count": 3049,
+      "page_url": "https://oaugf.ng/26/docman/7-annual-report-2016",
+      "url": "https://oaugf.ng/26/docman/7-annual-report-2016/file",
+      "slug": "7-annual-report-2016",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\7-annual-report-2016.pdf",
+      "size_bytes": 106746904,
+      "sha256": "db1256973dc475cd806ada2b0d8b26f48810ee2ee4aeb827da1675779f8006f6",
+      "status": "downloaded"
+    },
+    {
+      "id": 8,
+      "title": "Joint Environmental Audit on the Drying up of Lake Chad",
+      "description": "Lake Chad, once known as “the Pale-Chadian Sea”, was the fourth biggest lake in Africa in 1963 w...",
+      "category": "Environmental Audit",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": 622,
+      "page_url": "https://oaugf.ng/26/docman/8-joint-environmental-audit-on-the-drying-up-of-lake-chad",
+      "url": "https://oaugf.ng/26/docman/8-joint-environmental-audit-on-the-drying-up-of-lake-chad/file",
+      "slug": "8-joint-environmental-audit-on-the-drying-up-of-lake-chad",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Environmental Audit\\8-joint-environmental-audit-on-the-drying-up-of-lake-chad.pdf",
+      "size_bytes": 6902944,
+      "sha256": "a761e9a2f8fc375e46e9389b40147d9b09e6d290890010e77f29b1c6e838dd68",
+      "status": "downloaded"
+    },
+    {
+      "id": 9,
+      "title": "National Audit Report on Environmental Audit of the drying up of the Lake Chad",
+      "description": "The objectives of the Environmental Audit of Lake Chad were to determine whether Nigeria has effecti...",
+      "category": "Environmental Audit",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": 641,
+      "page_url": "https://oaugf.ng/26/docman/9-national-audit-report-on-environmental-audit-of-the-drying-up-of-the-lake-chad",
+      "url": "https://oaugf.ng/26/docman/9-national-audit-report-on-environmental-audit-of-the-drying-up-of-the-lake-chad/file",
+      "slug": "9-national-audit-report-on-environmental-audit-of-the-drying-up-of-the-lake-chad",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Environmental Audit\\9-national-audit-report-on-environmental-audit-of-the-drying-up-of-the-lake-chad.pdf",
+      "size_bytes": 23398968,
+      "sha256": "1ed547d2e39eb064488c1fffc8814ed74651e399a962c203ca2c5cec544c8d3c",
+      "status": "downloaded"
+    },
+    {
+      "id": 10,
+      "title": "Annual Report 2017",
+      "description": "I have audited the financial statements of the Federal Government of Nigeria, which comprise the sta...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2017"
+      ],
+      "tags": [
+        "2017"
+      ],
+      "published_date": null,
+      "site_download_count": 3197,
+      "page_url": "https://oaugf.ng/26/docman/10-annual-report-2017",
+      "url": "https://oaugf.ng/26/docman/10-annual-report-2017/file",
+      "slug": "10-annual-report-2017",
+      "content_type": "application/pdf",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\10-annual-report-2017.pdf",
+      "size_bytes": 112522226,
+      "sha256": "f638aef4ba13c5d79c801081b8f29a490655fbc88e73f744573765a643495019",
+      "status": "downloaded"
+    },
+    {
+      "id": 11,
+      "title": "NDDC REPORT OF 2013 to  2018",
+      "description": "",
+      "category": "Compliance Audit",
+      "years": [
+        "2013",
+        "2018"
+      ],
+      "tags": [
+        "2013",
+        "2018"
+      ],
+      "published_date": null,
+      "site_download_count": 4544,
+      "page_url": "https://oaugf.ng/26/docman/11-nddc-report-of-2013-to-2018",
+      "url": "https://oaugf.ng/26/docman/11-nddc-report-of-2013-to-2018/file",
+      "slug": "11-nddc-report-of-2013-to-2018",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Compliance Audit\\11-nddc-report-of-2013-to-2018.pdf",
+      "size_bytes": 7551154,
+      "sha256": "420b1ec7f308fa6650acc930ef564318a6b9edef4b0e8b982fb512c9d5400957",
+      "status": "downloaded"
+    },
+    {
+      "id": 13,
+      "title": "NDDC Report 2008 2012",
+      "description": "",
+      "category": "Compliance Audit",
+      "years": [
+        "2012"
+      ],
+      "tags": [
+        "2012",
+        "NDDC"
+      ],
+      "published_date": null,
+      "site_download_count": 1459,
+      "page_url": "https://oaugf.ng/26/docman/13-nddc-report-2008-2012",
+      "url": "https://oaugf.ng/26/docman/13-nddc-report-2008-2012/file",
+      "slug": "13-nddc-report-2008-2012",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/13-nddc-report-2)"
+    },
+    {
+      "id": 14,
+      "title": "Annual Report 2018",
+      "description": "",
+      "category": "Annual Audit Report",
+      "years": [
+        "2018"
+      ],
+      "tags": [
+        "2018"
+      ],
+      "published_date": null,
+      "site_download_count": 5024,
+      "page_url": "https://oaugf.ng/26/docman/14-annual-report-2018",
+      "url": "https://oaugf.ng/26/docman/14-annual-report-2018/file",
+      "slug": "14-annual-report-2018",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\14-annual-report-2018.pdf",
+      "size_bytes": 6061982,
+      "sha256": "6785be7d16828c4bf1aa421dc2fe04eb773f8f73ab6ce32fd0704ea01642ee5b",
+      "status": "downloaded"
+    },
+    {
+      "id": 15,
+      "title": "Annual Report 2018 - Part II",
+      "description": "",
+      "category": "Annual Audit Report",
+      "years": [
+        "2018"
+      ],
+      "tags": [
+        "2018"
+      ],
+      "published_date": null,
+      "site_download_count": 1405,
+      "page_url": "https://oaugf.ng/26/docman/15-annual-report-2018-part-ii",
+      "url": "https://oaugf.ng/26/docman/15-annual-report-2018-part-ii/file",
+      "slug": "15-annual-report-2018-part-ii",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\15-annual-report-2018-part-ii.pdf",
+      "size_bytes": 270313520,
+      "sha256": "0fab15b6dc65ffb594fd044c327e79720f8f3952466ad758a5cecf995a78890c",
+      "status": "downloaded"
+    },
+    {
+      "id": 16,
+      "title": "Annual Audit Report 2000",
+      "description": "Annual Audit Report 2000...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2000"
+      ],
+      "tags": [
+        "2000"
+      ],
+      "published_date": null,
+      "site_download_count": 300,
+      "page_url": "https://oaugf.ng/26/docman/16-annual-audit-report-2000",
+      "url": "https://oaugf.ng/26/docman/16-annual-audit-report-2000/file",
+      "slug": "16-annual-audit-report-2000",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/16-annual-audit-)"
+    },
+    {
+      "id": 18,
+      "title": "2002 Audit Report (Part 2)",
+      "description": "2002 Audit Report (Part 2)...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2002"
+      ],
+      "tags": [
+        "2002"
+      ],
+      "published_date": null,
+      "site_download_count": 340,
+      "page_url": "https://oaugf.ng/26/docman/18-2002-audit-report-part-2",
+      "url": "https://oaugf.ng/26/docman/18-2002-audit-report-part-2/file",
+      "slug": "18-2002-audit-report-part-2",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/18-2002-audit-re)"
+    },
+    {
+      "id": 19,
+      "title": "2003 Part 2",
+      "description": "Audit Annual Report 2003 Part 2...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2003"
+      ],
+      "tags": [
+        "2003"
+      ],
+      "published_date": null,
+      "site_download_count": 257,
+      "page_url": "https://oaugf.ng/26/docman/19-2003-part-2",
+      "url": "https://oaugf.ng/26/docman/19-2003-part-2/file",
+      "slug": "19-2003-part-2",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/19-2003-part-2/f)"
+    },
+    {
+      "id": 20,
+      "title": "2004 Part 2 (1 31)",
+      "description": "Annual Audit Report 2004...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2004"
+      ],
+      "tags": [
+        "2004"
+      ],
+      "published_date": null,
+      "site_download_count": 255,
+      "page_url": "https://oaugf.ng/26/docman/20-2004-part-2-1-31",
+      "url": "https://oaugf.ng/26/docman/20-2004-part-2-1-31/file",
+      "slug": "20-2004-part-2-1-31",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/20-2004-part-2-1)"
+    },
+    {
+      "id": 21,
+      "title": "2005 Part 2 1 36",
+      "description": "Annual Audit Report 2005 pt2...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2005"
+      ],
+      "tags": [
+        "2005"
+      ],
+      "published_date": null,
+      "site_download_count": 384,
+      "page_url": "https://oaugf.ng/26/docman/21-2005-part-2-1-36",
+      "url": "https://oaugf.ng/26/docman/21-2005-part-2-1-36/file",
+      "slug": "21-2005-part-2-1-36",
+      "status": "error (404 Client Error: Not Found for url: https://oaugf.ng/26/docman/21-2005-part-2-1)"
+    },
+    {
+      "id": 22,
+      "title": "2005 Part 2 34 60",
+      "description": "Anual Audit Report (Part 2)...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2005"
+      ],
+      "tags": [
+        "2005"
+      ],
+      "published_date": null,
+      "site_download_count": 372,
+      "page_url": "https://oaugf.ng/26/docman/22-2005-part-2-34-60",
+      "url": "https://oaugf.ng/26/docman/22-2005-part-2-34-60/file",
+      "slug": "22-2005-part-2-34-60",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\22-2005-part-2-34-60.pdf",
+      "size_bytes": 14256432,
+      "sha256": "49158c935447ca4ad447d524a44e5fb264255580446b44e9f69ece780e865594",
+      "status": "downloaded"
+    },
+    {
+      "id": 23,
+      "title": "2007 Annual Audit Report",
+      "description": "Annual Audit 2007...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2007"
+      ],
+      "tags": [
+        "2007"
+      ],
+      "published_date": null,
+      "site_download_count": 788,
+      "page_url": "https://oaugf.ng/26/docman/23-2007-annual-audit-report",
+      "url": "https://oaugf.ng/26/docman/23-2007-annual-audit-report/file",
+      "slug": "23-2007-annual-audit-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\23-2007-annual-audit-report.pdf",
+      "size_bytes": 10197468,
+      "sha256": "6cae1a029856285d16212c94d6ed6396c9bcc320a72afb1c52d87836f10eea97",
+      "status": "downloaded"
+    },
+    {
+      "id": 24,
+      "title": "2008 ANNUAL REPORT",
+      "description": "Annual Audit Report 2008...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2008"
+      ],
+      "tags": [
+        "2008",
+        "annual"
+      ],
+      "published_date": null,
+      "site_download_count": 523,
+      "page_url": "https://oaugf.ng/26/docman/24-2008-annual-report",
+      "url": "https://oaugf.ng/26/docman/24-2008-annual-report/file",
+      "slug": "24-2008-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\24-2008-annual-report.pdf",
+      "size_bytes": 13773776,
+      "sha256": "6fdbc2773d5159ce563847a7c9517881bd1d5a2bc53166be9957710f8978332e",
+      "status": "downloaded"
+    },
+    {
+      "id": 25,
+      "title": "2009 ANNUAL REPORT",
+      "description": "Annual Audit Report 2009...",
+      "category": "Annual Audit Report",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": 624,
+      "page_url": "https://oaugf.ng/26/docman/25-2009-annual-report",
+      "url": "https://oaugf.ng/26/docman/25-2009-annual-report/file",
+      "slug": "25-2009-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\25-2009-annual-report.pdf",
+      "size_bytes": 22882478,
+      "sha256": "8bad0b7b1b202c096afcbf9fb0351365bcc3d974c607644d2ac636334843fa5e",
+      "status": "downloaded"
+    },
+    {
+      "id": 26,
+      "title": "2010 ANNUAL REPORT",
+      "description": "Annual Audit Report 2010...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2010"
+      ],
+      "tags": [
+        "2010"
+      ],
+      "published_date": null,
+      "site_download_count": 356,
+      "page_url": "https://oaugf.ng/26/docman/26-2010-annual-report",
+      "url": "https://oaugf.ng/26/docman/26-2010-annual-report/file",
+      "slug": "26-2010-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\26-2010-annual-report.pdf",
+      "size_bytes": 105391952,
+      "sha256": "0b1a11764abb1b107c51d08d7743e8e53bbd59ede4c8ace0b34080b7fae3847e",
+      "status": "downloaded"
+    },
+    {
+      "id": 27,
+      "title": "2011 Annual Report",
+      "description": "Annual Audit Report 2011...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2011"
+      ],
+      "tags": [
+        "2011"
+      ],
+      "published_date": null,
+      "site_download_count": 280,
+      "page_url": "https://oaugf.ng/26/docman/27-2011-annual-report",
+      "url": "https://oaugf.ng/26/docman/27-2011-annual-report/file",
+      "slug": "27-2011-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\27-2011-annual-report.pdf",
+      "size_bytes": 31119912,
+      "sha256": "f157d7feaa22a0222f0bec8a0f23272a8deee82ac4e56ae60a8a24ebdbffca0b",
+      "status": "downloaded"
+    },
+    {
+      "id": 28,
+      "title": "2012 ANNUAL REPORT",
+      "description": "Annual Audit Report 2012...",
+      "category": "Annual Audit Report",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": 275,
+      "page_url": "https://oaugf.ng/26/docman/28-2012-annual-report",
+      "url": "https://oaugf.ng/26/docman/28-2012-annual-report/file",
+      "slug": "28-2012-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\28-2012-annual-report.pdf",
+      "size_bytes": 193254656,
+      "sha256": "544fc073f1499df1602aa40ee5a3711faa42e13d6c1b9c64ec8dfe10df10b476",
+      "status": "downloaded"
+    },
+    {
+      "id": 29,
+      "title": "2013 Annual Report",
+      "description": "Annual Audit Report 2013...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2013"
+      ],
+      "tags": [
+        "2013"
+      ],
+      "published_date": null,
+      "site_download_count": 341,
+      "page_url": "https://oaugf.ng/26/docman/29-2013-annual-report",
+      "url": "https://oaugf.ng/26/docman/29-2013-annual-report/file",
+      "slug": "29-2013-annual-report",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\29-2013-annual-report.pdf",
+      "size_bytes": 49810272,
+      "sha256": "13d700d4493e2520bd8f6ff038ce79dde306674fb21e24beaa246137b6d0fa98",
+      "status": "downloaded"
+    },
+    {
+      "id": 30,
+      "title": "1999 AGF Report page 1 63",
+      "description": "Annual Audit Report 1999 (Part 1)...",
+      "category": "Annual Audit Report",
+      "years": [
+        "1999"
+      ],
+      "tags": [
+        "1999"
+      ],
+      "published_date": null,
+      "site_download_count": 232,
+      "page_url": "https://oaugf.ng/26/docman/30-1999-agf-report-page-1-63",
+      "url": "https://oaugf.ng/26/docman/30-1999-agf-report-page-1-63/file",
+      "slug": "30-1999-agf-report-page-1-63",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\30-1999-agf-report-page-1-63.pdf",
+      "size_bytes": 93980296,
+      "sha256": "170c61cff9ecd4047bd57cb2f9080e4847c016cbd1de434c2c2cc38a40273426",
+      "status": "downloaded"
+    },
+    {
+      "id": 31,
+      "title": "1999 AGF Report page 64 151",
+      "description": "Annual Audit Report 1999 (Part 2)...",
+      "category": "Annual Audit Report",
+      "years": [
+        "1999"
+      ],
+      "tags": [
+        "1999"
+      ],
+      "published_date": null,
+      "site_download_count": 247,
+      "page_url": "https://oaugf.ng/26/docman/31-1999-agf-report-page-64-151",
+      "url": "https://oaugf.ng/26/docman/31-1999-agf-report-page-64-151/file",
+      "slug": "31-1999-agf-report-page-64-151",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\31-1999-agf-report-page-64-151.pdf",
+      "size_bytes": 148097864,
+      "sha256": "d529f3d6a14c1316bcfb600d6a6e6ab6f23b1bd4a872a3ea61364a2421769b2a",
+      "status": "downloaded"
+    },
+    {
+      "id": 32,
+      "title": "1999 AGF Report page 152 233",
+      "description": "Annual Audit Report 1999 (Part 3)...",
+      "category": "Annual Audit Report",
+      "years": [
+        "1999"
+      ],
+      "tags": [
+        "1999"
+      ],
+      "published_date": null,
+      "site_download_count": 248,
+      "page_url": "https://oaugf.ng/26/docman/32-1999-agf-report-page-152-233",
+      "url": "https://oaugf.ng/26/docman/32-1999-agf-report-page-152-233/file",
+      "slug": "32-1999-agf-report-page-152-233",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\32-1999-agf-report-page-152-233.pdf",
+      "size_bytes": 117231568,
+      "sha256": "6d31f8dae6a439e7ff92e0f6afdd6d266ddd5ba91afea23e24bed937fa13afb2",
+      "status": "downloaded"
+    },
+    {
+      "id": 33,
+      "title": "AuGF Report on FGN Consolidated Financial Statement for 2019",
+      "description": "AuGF Report on FGN Consolidated Financial Statement for 2019...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2019"
+      ],
+      "tags": [
+        "2019"
+      ],
+      "published_date": null,
+      "site_download_count": 4088,
+      "page_url": "https://oaugf.ng/26/docman/33-augf-report-on-fgn-consolidated-financial-statement-for-2019",
+      "url": "https://oaugf.ng/26/docman/33-augf-report-on-fgn-consolidated-financial-statement-for-2019/file",
+      "slug": "33-augf-report-on-fgn-consolidated-financial-statement-for-2019",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\33-augf-report-on-fgn-consolidated-financial-statement-for-2019.pdf",
+      "size_bytes": 18490876,
+      "sha256": "a70bd7f00f3b0742f06bf7d35a715f9fc1bfe2e9e680171cde25f168d4fa744a",
+      "status": "downloaded"
+    },
+    {
+      "id": 34,
+      "title": "AuGF Annual Report Non-compliance 2019",
+      "description": "AuGF Annual Report 2019 - Non-compliance...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2019"
+      ],
+      "tags": [
+        "2019"
+      ],
+      "published_date": null,
+      "site_download_count": 2867,
+      "page_url": "https://oaugf.ng/26/docman/34-augf-annual-report-non-compliance-2019",
+      "url": "https://oaugf.ng/26/docman/34-augf-annual-report-non-compliance-2019/file",
+      "slug": "34-augf-annual-report-non-compliance-2019",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\34-augf-annual-report-non-compliance-2019.pdf",
+      "size_bytes": 150170001,
+      "sha256": "330d6e4a80be556704b311b29943c0cd988bf14c7905047298a6deb438b03d46",
+      "status": "downloaded"
+    },
+    {
+      "id": 35,
+      "title": "REPORT ON MANAGEMENT OF RESOURCES FOR THE PROVISION OF AFFORDABLE/SOCIAL HOMES FOR LOW-INCOME EARNERS IN NIGERIA BY FAMILY HOMES FUNDS LIMITED (2018 TO 2020)",
+      "description": "REPORT ON MANAGEMENT OF RESOURCES FOR THE PROVISION OF AFFORDABLE/SOCIAL HOMES FOR LOW-INCOME EARNER...",
+      "category": "Performance Audit",
+      "years": [
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020"
+      ],
+      "tags": [
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020"
+      ],
+      "published_date": "2022-09-01",
+      "site_download_count": 320,
+      "page_url": "https://oaugf.ng/26/docman/35-report-on-management-of-resources-for-the-provision-of-affordable-social-homes-for-low-income-earners-in-nigeria-by-family-homes-funds-limited-2018-to-2020",
+      "url": "https://oaugf.ng/26/docman/35-report-on-management-of-resources-for-the-provision-of-affordable-social-homes-for-low-income-earners-in-nigeria-by-family-homes-funds-limited-2018-to-2020/file",
+      "slug": "35-report-on-management-of-resources-for-the-provision-of-affordable-social-homes-for-low-income-earners-in-nigeria-by-family-homes-funds-limited-2018-to-2020",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\35-report-on-management-of-resources-for-the-provision-of-affordable-social-homes-for-low-income-ear.pdf",
+      "size_bytes": 75142644,
+      "sha256": "4afe51a542f1fbb354a86645616e86196f7d93db0ba753cfa59fd32437b8e6e7",
+      "status": "downloaded"
+    },
+    {
+      "id": 36,
+      "title": "REPORT ON PRE-SHIPMENT INSPECTION AND MONITORING OF CRUDE OIL AND GAS EXPORTS BY FEDERAL MINISTRY OF FINANCE, BUDGET AND NATIONAL PLANNING FOR THE PERIOD JANUARY 2016 TO DECEMBER, 2020",
+      "description": "",
+      "category": "Performance Audit",
+      "years": [
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020"
+      ],
+      "tags": [
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020"
+      ],
+      "published_date": "2022-09-01",
+      "site_download_count": 879,
+      "page_url": "https://oaugf.ng/26/docman/36-report-on-pre-shipment-inspection-and-monitoring-of-crude-oil-and-gas-exports-by-federal-ministry-of-finance-budget-and-national-planning-for-the-period-january-2016-to-december-2020",
+      "url": "https://oaugf.ng/26/docman/36-report-on-pre-shipment-inspection-and-monitoring-of-crude-oil-and-gas-exports-by-federal-ministry-of-finance-budget-and-national-planning-for-the-period-january-2016-to-december-2020/file",
+      "slug": "36-report-on-pre-shipment-inspection-and-monitoring-of-crude-oil-and-gas-exports-by-federal-ministry-of-finance-budget-and-national-planning-for-the-period-january-2016-to-december-2020",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\36-report-on-pre-shipment-inspection-and-monitoring-of-crude-oil-and-gas-exports-by-federal-ministry.pdf",
+      "size_bytes": 406582288,
+      "sha256": "f206341e106826b1a8ee06f86b17cc399cd230b6ef88f658060effccb26676b0",
+      "status": "downloaded"
+    },
+    {
+      "id": 37,
+      "title": "THE FEDERAL ROADS MAINTENANCE AGENCY (FERMA)",
+      "description": "PERFORMANCE AUDIT REPORT OF THE AUDITOR-GENERAL FOR THE FEDERATION ON MONITORING OF THE MAINTENANCE ...",
+      "category": "Performance Audit",
+      "years": [
+        "2020"
+      ],
+      "tags": [
+        "2020"
+      ],
+      "published_date": null,
+      "site_download_count": 524,
+      "page_url": "https://oaugf.ng/26/docman/37-ferma-final-report-published",
+      "url": "https://oaugf.ng/26/docman/37-ferma-final-report-published/file",
+      "slug": "37-ferma-final-report-published",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\37-ferma-final-report-published.pdf",
+      "size_bytes": 7466552,
+      "sha256": "5177213420f5ea8720fc6d7a12f40907fcd1b67cfcfdb707836d92b88bddfc0f",
+      "status": "downloaded"
+    },
+    {
+      "id": 38,
+      "title": "NERC REPORT 2016-2018",
+      "description": "The Role of the Nigerian Electricity Regulatory Commission (NERC) in the provision of meters and bil...",
+      "category": "Performance Audit",
+      "years": [
+        "2016",
+        "2018"
+      ],
+      "tags": [
+        "2016",
+        "2018"
+      ],
+      "published_date": null,
+      "site_download_count": 296,
+      "page_url": "https://oaugf.ng/26/docman/38-nerc-report-as-reviewed",
+      "url": "https://oaugf.ng/26/docman/38-nerc-report-as-reviewed/file",
+      "slug": "38-nerc-report-as-reviewed",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\38-nerc-report-as-reviewed.pdf",
+      "size_bytes": 13690704,
+      "sha256": "e5d7063d83caf66cf18b95631fbdcf96ebb7b5e5cceae6a0e2dfc7b2900388b3",
+      "status": "downloaded"
+    },
+    {
+      "id": 39,
+      "title": "Performance audit on FGN budget preparation process 2020",
+      "description": "Performance audit on FGN budget preparation process 2020...",
+      "category": "Performance Audit",
+      "years": [
+        "2020"
+      ],
+      "tags": [
+        "2020"
+      ],
+      "published_date": null,
+      "site_download_count": 468,
+      "page_url": "https://oaugf.ng/26/docman/39-performance-audit-on-fgn-budget-preparation-process-2020-6",
+      "url": "https://oaugf.ng/26/docman/39-performance-audit-on-fgn-budget-preparation-process-2020-6/file",
+      "slug": "39-performance-audit-on-fgn-budget-preparation-process-2020-6",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Performance Audit\\39-performance-audit-on-fgn-budget-preparation-process-2020-6.pdf",
+      "size_bytes": 10332842,
+      "sha256": "390d3828b9e1cbe566e4bbe2f8dd97efb6541bcd38ece9769d4a4176b5592f86",
+      "status": "downloaded"
+    },
+    {
+      "id": 40,
+      "title": "Interim Report: Special Audit of the Federal Government's Response to Covid19",
+      "description": "Interim Report: Special Audit of the Federal Government's Response to Covid19 for the period 1st Mar...",
+      "category": "Compliance Audit",
+      "years": [
+        "2020"
+      ],
+      "tags": [
+        "2020"
+      ],
+      "published_date": "2023-02-05",
+      "site_download_count": 333,
+      "page_url": "https://oaugf.ng/26/docman/40-interim-report-special-audit-of-the-federal-government-s-response-to-covid19",
+      "url": "https://oaugf.ng/26/docman/40-interim-report-special-audit-of-the-federal-government-s-response-to-covid19/file",
+      "slug": "40-interim-report-special-audit-of-the-federal-government-s-response-to-covid19",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Compliance Audit\\40-interim-report-special-audit-of-the-federal-government-s-response-to-covid19.pdf",
+      "size_bytes": 5187644,
+      "sha256": "430c1c5d5147dd25cff8550aeba56aa7efe4e63d607e00d72b4507c1e6c11ef4",
+      "status": "downloaded"
+    },
+    {
+      "id": 41,
+      "title": "Annual Audit Report 2020",
+      "description": "Auditor-General Annual Audit Report of the year 2020...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2020"
+      ],
+      "tags": [
+        "annual",
+        "2020"
+      ],
+      "published_date": "2024-01-15",
+      "site_download_count": 252,
+      "page_url": "https://oaugf.ng/26/docman/41-annual-audit-report-2020",
+      "url": "https://oaugf.ng/26/docman/41-annual-audit-report-2020/file",
+      "slug": "41-annual-audit-report-2020",
+      "content_type": "application/pdf",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\41-annual-audit-report-2020.pdf",
+      "size_bytes": 283325486,
+      "sha256": "91b4b9b8228502ecf3c8ab9de958e8063f0e7159f80a36678338c13cead8957e",
+      "status": "downloaded"
+    },
+    {
+      "id": 42,
+      "title": "Annual Report on Non-Compliance-Internal Control Weakness",
+      "description": "Annual Report on Non-Compliance-Internal Control Weaknesses in Ministries, Departments and Agencies ...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2020"
+      ],
+      "tags": [
+        "annual",
+        "2020"
+      ],
+      "published_date": null,
+      "site_download_count": 104,
+      "page_url": "https://oaugf.ng/26/docman/42-annual-report-on-non-compliance-internal-control-weakness",
+      "url": "https://oaugf.ng/26/docman/42-annual-report-on-non-compliance-internal-control-weakness/file",
+      "slug": "42-annual-report-on-non-compliance-internal-control-weakness",
+      "content_type": "application/pdf",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\42-annual-report-on-non-compliance-internal-control-weakness.pdf",
+      "size_bytes": 300650829,
+      "sha256": "1fb88aa9b6c106d05b61a2365d35785d04732a9b3d6a907cca013c67c1746288",
+      "status": "downloaded"
+    },
+    {
+      "id": 43,
+      "title": "Annual Report on Non-Compliance-Internal Control Weakness 2023 Vol 1",
+      "description": "Annual Report on Non-Compliance-Internal Control Weaknesses in Ministries, Departments and Agencies ...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2023"
+      ],
+      "tags": [
+        "2023"
+      ],
+      "published_date": null,
+      "site_download_count": 0,
+      "page_url": "https://oaugf.ng/26/docman/43-annual-report-on-non-compliance-internal-control-weakness-1",
+      "url": "https://oaugf.ng/26/docman/43-annual-report-on-non-compliance-internal-control-weakness-1/file",
+      "slug": "43-annual-report-on-non-compliance-internal-control-weakness-1",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\43-annual-report-on-non-compliance-internal-control-weakness-1.pdf",
+      "size_bytes": 232474314,
+      "sha256": "d6d4bd8f751e56fa41b6be392387208bfdf17291f67770a2c3add3bde3a1e284",
+      "status": "downloaded"
+    },
+    {
+      "id": 44,
+      "title": "Annual Report on Non-Compliance-Internal Control Weakness 2023 Vol II",
+      "description": "Annual Report on Non-Compliance-Internal Control Weaknesses in Ministries, Departments and Agencies ...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2023"
+      ],
+      "tags": [
+        "2023"
+      ],
+      "published_date": null,
+      "site_download_count": 0,
+      "page_url": "https://oaugf.ng/26/docman/44-annual-report-on-non-compliance-internal-control-weakness-2",
+      "url": "https://oaugf.ng/26/docman/44-annual-report-on-non-compliance-internal-control-weakness-2/file",
+      "slug": "44-annual-report-on-non-compliance-internal-control-weakness-2",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\44-annual-report-on-non-compliance-internal-control-weakness-2.pdf",
+      "size_bytes": 255617226,
+      "sha256": "61a1108a3393a5843c9606921415e28963af743a209068717e1f62790dee95a7",
+      "status": "downloaded"
+    },
+    {
+      "id": 45,
+      "title": "Annual Report on Non-Compliance-Internal Control Weakness 2024 Vol I",
+      "description": "Annual Report on Non-Compliance-Internal Control Weaknesses in Ministries, Departments and Agencies ...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2024"
+      ],
+      "tags": [
+        "2024"
+      ],
+      "published_date": null,
+      "site_download_count": 0,
+      "page_url": "https://oaugf.ng/26/docman/45-annual-report-on-non-compliance-internal-control-weakness-3",
+      "url": "https://oaugf.ng/26/docman/45-annual-report-on-non-compliance-internal-control-weakness-3/file",
+      "slug": "45-annual-report-on-non-compliance-internal-control-weakness-3",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\45-annual-report-on-non-compliance-internal-control-weakness-3.pdf",
+      "size_bytes": 309683912,
+      "sha256": "2e70ab52a29cb8ab1b80352562ff310f78291108490668fad5ec306ef8946ff0",
+      "status": "downloaded"
+    },
+    {
+      "id": 46,
+      "title": "Annual Report on Non-Compliance-Internal Control Weakness 2024 Vol II",
+      "description": "Annual Report on Non-Compliance-Internal Control Weaknesses in Ministries, Departments and Agencies ...",
+      "category": "Annual Audit Report",
+      "years": [
+        "2024"
+      ],
+      "tags": [
+        "2024"
+      ],
+      "published_date": null,
+      "site_download_count": 0,
+      "page_url": "https://oaugf.ng/26/docman/46-annual-report-on-non-compliance-internal-control-weakness-4",
+      "url": "https://oaugf.ng/26/docman/46-annual-report-on-non-compliance-internal-control-weakness-4/file",
+      "slug": "46-annual-report-on-non-compliance-internal-control-weakness-4",
+      "content_type": "application/pdf;charset=utf-8",
+      "local_path": "oaugf_pdfs\\Annual Audit Report\\46-annual-report-on-non-compliance-internal-control-weakness-4.pdf",
+      "size_bytes": 223717363,
+      "sha256": "0830799b925e15e9ca2de4c52922f9f17b2470192c3761fc27f8cba066ce49d1",
+      "status": "downloaded"
+    },
+    {
+      "title": "Office of the Auditor-General: History and Introduction (book)",
+      "category": "About OAuGF",
+      "url": "https://oaugf.ng/images/downloads/office%20of%20the%20Auditor%20General%20%20History%20and%20introduction%20book.pdf",
+      "id": "extra-history",
+      "description": "",
+      "years": [],
+      "tags": [],
+      "published_date": null,
+      "site_download_count": null,
+      "page_url": "",
+      "slug": "extra-history",
+      "content_type": "application/pdf",
+      "local_path": "oaugf_pdfs\\About OAuGF\\extra-history.pdf",
+      "size_bytes": 3386566,
+      "sha256": "e54801bfe2d0891c81e39956ef7738e1eb19cc6ee922434a3d09aa4216233679",
+      "status": "downloaded"
+    }
+  ]
+}

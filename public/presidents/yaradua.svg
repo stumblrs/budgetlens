@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Umaru Musa Yar'Adua">
+  <defs>
+    <linearGradient id="bg-yar" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0c4a6e"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <clipPath id="circle-yar">
+      <circle cx="100" cy="100" r="96"/>
+    </clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#bg-yar)" stroke="#38bdf8" stroke-width="4"/>
+  <g clip-path="url(#circle-yar)">
+    <!-- Babban Riga -->
+    <path d="M24 200 C28 148 58 136 100 136 C142 136 172 148 176 200 Z" fill="#f1f5f9"/>
+    <path d="M82 137 L100 176 L118 137" fill="none" stroke="#0284c7" stroke-width="3.5"/>
+    <!-- Neck -->
+    <rect x="86" y="114" width="28" height="27" rx="10" fill="#7a4c32"/>
+    <!-- Face -->
+    <ellipse cx="100" cy="89" rx="32" ry="37" fill="#8b5a3c"/>
+    <ellipse cx="67" cy="91" rx="4.5" ry="8.5" fill="#7a4c32"/>
+    <ellipse cx="133" cy="91" rx="4.5" ry="8.5" fill="#7a4c32"/>
+    <!-- Glasses -->
+    <rect x="76" y="75" width="20" height="13" rx="4" fill="none" stroke="#0f172a" stroke-width="2"/>
+    <rect x="104" y="75" width="20" height="13" rx="4" fill="none" stroke="#0f172a" stroke-width="2"/>
+    <line x1="96" y1="81" x2="104" y2="81" stroke="#0f172a" stroke-width="2"/>
+    <circle cx="86" cy="81" r="2.6" fill="#0f172a"/>
+    <circle cx="114" cy="81" r="2.6" fill="#0f172a"/>
+    <!-- Mustache & calm mouth -->
+    <path d="M90 100 Q100 97 110 100" fill="none" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M91 106 Q100 110 109 106" fill="none" stroke="#4a2c19" stroke-width="2" stroke-linecap="round"/>
+    <!-- Zanna Bukar Northern Cap -->
+    <path d="M67 62 L71 38 Q100 28 129 38 L133 62 Q100 54 67 62 Z" fill="#1e293b"/>
+    <path d="M72 48 L128 48 M70 55 L130 55" stroke="#38bdf8" stroke-width="1.8" stroke-dasharray="4 3"/>
+  </g>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Muhammadu Buhari">
+  <defs>
+    <linearGradient id="bg-pmb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <clipPath id="circle-pmb">
+      <circle cx="100" cy="100" r="96"/>
+    </clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#bg-pmb)" stroke="#a78bfa" stroke-width="4"/>
+  <g clip-path="url(#circle-pmb)">
+    <!-- White Babban Riga -->
+    <path d="M24 200 C28 148 58 136 100 136 C142 136 172 148 176 200 Z" fill="#f8fafc"/>
+    <path d="M78 138 L100 180 L122 138" fill="none" stroke="#7c3aed" stroke-width="3.5"/>
+    <!-- Neck -->
+    <rect x="86" y="114" width="28" height="27" rx="10" fill="#70442a"/>
+    <!-- Tall Narrow Face -->
+    <ellipse cx="100" cy="89" rx="30" ry="38" fill="#815235"/>
+    <ellipse cx="69" cy="91" rx="4.5" ry="8.5" fill="#70442a"/>
+    <ellipse cx="131" cy="91" rx="4.5" ry="8.5" fill="#70442a"/>
+    <!-- Rectangular Glasses -->
+    <rect x="76" y="75" width="20" height="12" rx="3" fill="none" stroke="#1e293b" stroke-width="2.2"/>
+    <rect x="104" y="75" width="20" height="12" rx="3" fill="none" stroke="#1e293b" stroke-width="2.2"/>
+    <line x1="96" y1="81" x2="104" y2="81" stroke="#1e293b" stroke-width="2.2"/>
+    <circle cx="86" cy="81" r="2.5" fill="#0f172a"/>
+    <circle cx="114" cy="81" r="2.5" fill="#0f172a"/>
+    <!-- Nose & Gray Mustache -->
+    <path d="M100 80 L98 96 L103 97" fill="none" stroke="#4a2c19" stroke-width="2"/>
+    <path d="M90 103 Q100 100 110 103" fill="none" stroke="#cbd5e1" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M92 109 Q100 112 108 109" fill="none" stroke="#4a2c19" stroke-width="2" stroke-linecap="round"/>
+    <!-- Embroidered Fulani/Northern Cap -->
+    <path d="M69 61 L73 36 Q100 26 127 36 L131 61 Q100 54 69 61 Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+    <path d="M74 47 Q100 42 126 47" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-dasharray="5 3"/>
+  </g>
+</svg>

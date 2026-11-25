@@ -1,0 +1,372 @@
+{
+  "Abia": {
+    "count": 17,
+    "sample_lgas": [
+      "Aba North",
+      "Aba South",
+      "Arochukwu",
+      "Bende",
+      "Ikwuano"
+    ]
+  },
+  "Federal Capital Territory": {
+    "count": 6,
+    "sample_lgas": [
+      "Abaji",
+      "Abuja Municipal",
+      "Bwari",
+      "Gwagwalada",
+      "Kuje"
+    ]
+  },
+  "Akwa Ibom": {
+    "count": 31,
+    "sample_lgas": [
+      "Abak",
+      "Eastern Obolo",
+      "Eket",
+      "Esit - Eket",
+      "Essien Udim"
+    ]
+  },
+  "Ebonyi": {
+    "count": 13,
+    "sample_lgas": [
+      "Abakaliki",
+      "Afikpo North",
+      "Afikpo South",
+      "Ebonyi",
+      "Ezza North"
+    ]
+  },
+  "Ogun": {
+    "count": 20,
+    "sample_lgas": [
+      "Abeokuta North",
+      "Abeokuta South",
+      "Ado-Odo/Ota",
+      "Egbado North",
+      "Egbado South"
+    ]
+  },
+  "Cross River": {
+    "count": 18,
+    "sample_lgas": [
+      "Abi",
+      "Akamkpa",
+      "Akpabuyo",
+      "Bakassi",
+      "Bekwara"
+    ]
+  },
+  "Imo": {
+    "count": 27,
+    "sample_lgas": [
+      "Aboh-Mbaise",
+      "Ahiazu-Mbaise",
+      "Ehime-Mbano",
+      "Ezinihitte",
+      "Ideato North"
+    ]
+  },
+  "Rivers": {
+    "count": 23,
+    "sample_lgas": [
+      "Abua/Odual",
+      "Ahoada East",
+      "Ahoada West",
+      "Akuku Toru",
+      "Andoni"
+    ]
+  },
+  "Kogi": {
+    "count": 21,
+    "sample_lgas": [
+      "Adavi",
+      "Ajaokuta",
+      "Ankpa",
+      "Bassa",
+      "Dekina"
+    ]
+  },
+  "Benue": {
+    "count": 23,
+    "sample_lgas": [
+      "Ado",
+      "Agatu",
+      "Apa",
+      "Buruku",
+      "Gboko"
+    ]
+  },
+  "Ekiti": {
+    "count": 16,
+    "sample_lgas": [
+      "Ado Ekiti",
+      "Aiyekire (Gbonyin)",
+      "Efon",
+      "Ekiti East",
+      "Ekiti South West"
+    ]
+  },
+  "Oyo": {
+    "count": 33,
+    "sample_lgas": [
+      "Afijio",
+      "Akinyele",
+      "Atiba",
+      "Atigbo",
+      "Egbeda"
+    ]
+  },
+  "Niger": {
+    "count": 25,
+    "sample_lgas": [
+      "Agaie",
+      "Agwara",
+      "Bida",
+      "Borgu",
+      "Bosso"
+    ]
+  },
+  "Lagos": {
+    "count": 20,
+    "sample_lgas": [
+      "Agege",
+      "Ajeromi-Ifelodun",
+      "Alimosho",
+      "Amuwo-Odofin",
+      "Apapa"
+    ]
+  },
+  "Anambra": {
+    "count": 21,
+    "sample_lgas": [
+      "Aguata",
+      "Anambra East",
+      "Anambra West",
+      "Anaocha",
+      "Awka North"
+    ]
+  },
+  "Osun": {
+    "count": 30,
+    "sample_lgas": [
+      "Aiyedade",
+      "Aiyedire",
+      "Atakumosa East",
+      "Atakumosa West",
+      "Boluwaduro"
+    ]
+  },
+  "Kano": {
+    "count": 44,
+    "sample_lgas": [
+      "Ajingi",
+      "Albasu",
+      "Bagwai",
+      "Bebeji",
+      "Bichi"
+    ]
+  },
+  "Gombe": {
+    "count": 11,
+    "sample_lgas": [
+      "Akko",
+      "Balanga",
+      "Billiri",
+      "Dukku",
+      "Funakaye"
+    ]
+  },
+  "Edo": {
+    "count": 18,
+    "sample_lgas": [
+      "Akoko-Edo",
+      "Egor",
+      "Esan Central",
+      "Esan North East",
+      "Esan South East"
+    ]
+  },
+  "Ondo": {
+    "count": 18,
+    "sample_lgas": [
+      "Akoko North East",
+      "Akoko North West",
+      "Akoko South East",
+      "Akoko South West",
+      "Akure North"
+    ]
+  },
+  "Nasarawa": {
+    "count": 13,
+    "sample_lgas": [
+      "Akwanga",
+      "Awe",
+      "Doma",
+      "Karu",
+      "Keana"
+    ]
+  },
+  "Kebbi": {
+    "count": 21,
+    "sample_lgas": [
+      "Aleiro",
+      "Arewa-Dandi",
+      "Argungu",
+      "Augie",
+      "Bagudo"
+    ]
+  },
+  "Bauchi": {
+    "count": 20,
+    "sample_lgas": [
+      "Alkaleri",
+      "Bauchi",
+      "Bogoro",
+      "Damban",
+      "Darazo"
+    ]
+  },
+  "Enugu": {
+    "count": 17,
+    "sample_lgas": [
+      "Aninri",
+      "Awgu",
+      "Enugu East",
+      "Enugu North",
+      "Enugu South"
+    ]
+  },
+  "Delta": {
+    "count": 25,
+    "sample_lgas": [
+      "Aniocha North",
+      "Aniocha South",
+      "Bomadi",
+      "Burutu",
+      "Ethiope East"
+    ]
+  },
+  "Zamfara": {
+    "count": 14,
+    "sample_lgas": [
+      "Anka",
+      "Bakura",
+      "Birnin Magaji",
+      "Bukkuyum",
+      "Bungudu"
+    ]
+  },
+  "Taraba": {
+    "count": 16,
+    "sample_lgas": [
+      "Ardo-Kola",
+      "Bali",
+      "Donga",
+      "Gashaka",
+      "Gassol"
+    ]
+  },
+  "Kwara": {
+    "count": 16,
+    "sample_lgas": [
+      "Asa",
+      "Baruten",
+      "Edu",
+      "Ekiti",
+      "Ifelodun"
+    ]
+  },
+  "Jigawa": {
+    "count": 27,
+    "sample_lgas": [
+      "Auyo",
+      "Babura",
+      "Biriniwa",
+      "Birni Kudu",
+      "Buji"
+    ]
+  },
+  "Yobe": {
+    "count": 17,
+    "sample_lgas": [
+      "Bade",
+      "Bursari",
+      "Damaturu",
+      "Fika",
+      "Fune"
+    ]
+  },
+  "Katsina": {
+    "count": 34,
+    "sample_lgas": [
+      "Bakori",
+      "Batagarawa",
+      "Batsari",
+      "Baure",
+      "Bindawa"
+    ]
+  },
+  "Plateau": {
+    "count": 17,
+    "sample_lgas": [
+      "Barikin Ladi",
+      "Bassa",
+      "Bokkos",
+      "Jos East",
+      "Jos North"
+    ]
+  },
+  "Sokoto": {
+    "count": 23,
+    "sample_lgas": [
+      "Binji",
+      "Bodinga",
+      "Dange-Shuni",
+      "Gada",
+      "Goronyo"
+    ]
+  },
+  "Kaduna": {
+    "count": 23,
+    "sample_lgas": [
+      "Birnin-Gwari",
+      "Chikun",
+      "Giwa",
+      "Igabi",
+      "Ikara"
+    ]
+  },
+  "Bayelsa": {
+    "count": 8,
+    "sample_lgas": [
+      "Brass",
+      "Ekeremor",
+      "Kolokuma/Opokuma",
+      "Nembe",
+      "Ogbia"
+    ]
+  },
+  "Adamawa": {
+    "count": 21,
+    "sample_lgas": [
+      "Demsa",
+      "Fufore",
+      "Ganye",
+      "Girei",
+      "Gombi"
+    ]
+  },
+  "Borno": {
+    "count": 27,
+    "sample_lgas": [
+      "Abadam",
+      "Askira/Uba",
+      "Bama",
+      "Bayo",
+      "Biu"
+    ]
+  }
+}

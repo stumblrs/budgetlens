@@ -1,0 +1,77 @@
+name: BudgetLens CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  frontend-and-static-audits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx tsc -b
+      - run: npx vitest run
+      - run: npm run build
+      - name: Verify Zero Disallowed Downloads (Strict PDF & DOCX Only)
+        run: |
+          if grep -rnE "Blob\([^)]*text/(csv|html|markdown|plain)|data:(text|image/svg\+xml)" src/; then
+            echo "ERROR: Disallowed non-PDF/DOCX download detected in src/"
+            exit 1
+          fi
+      - name: Verify Zero Undefined CSS Custom Properties
+        run: |
+          node -e '
+          const fs = require("fs");
+          const path = require("path");
+          const css = fs.readFileSync("src/index.css", "utf8");
+          const defined = new Set([...css.matchAll(/--([a-zA-Z0-9-]+)\s*:/g)].map(m => "--" + m[1]));
+          function walk(dir) {
+            let files = [];
+            for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+              const full = path.join(dir, entry.name);
+              if (entry.isDirectory()) files = files.concat(walk(full));
+              else if (/\.(tsx?|css)$/.test(entry.name)) files.push(full);
+            }
+            return files;
+          }
+          const missing = [];
+          for (const f of walk("src")) {
+            const text = fs.readFileSync(f, "utf8");
+            for (const m of text.matchAll(/var\((--[a-zA-Z0-9-]+)\)/g)) {
+              if (!defined.has(m[1])) missing.push(`${f}: ${m[1]}`);
+            }
+          }
+          if (missing.length) { console.error("Undefined CSS tokens:", missing); process.exit(1); }
+          console.log("All CSS var(--*) tokens verified against src/index.css");
+          '
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r backend/requirements.txt
+      - run: pytest tests/python/ -v
+
+  playwright-e2e:
+    runs-on: ubuntu-latest
+    needs: frontend-and-static-audits
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npx playwright test

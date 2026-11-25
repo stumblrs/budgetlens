@@ -1,0 +1,47 @@
+# Raw & Large Downloaded Archives
+bir_pdfs/
+policy_pdfs/
+NocopoJson/
+govspend_data/
+source_pdfs/
+dmo_pdfs/
+procurement_data/
+
+# Local SQLite Indexes & Databases
+backend/data/*.sqlite
+backend/data/*.sqlite-*
+*.sqlite
+*.db
+
+# Local Model Weights
+ingestion/gemma-*.gguf
+*.gguf
+
+# Python & Node Environments / Builds / Caches
+ingestion/ocr_cache/
+.venv/
+venv/
+node_modules/
+dist/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+test-results/
+scratch/
+.coverage
+htmlcov/
+
+# Local Generated Static Datasets (1.07 GB; loaded into Cloudflare D1 instead of Git/Frontend)
+public/datasets/
+data_archive/
+ingestion/checkpoints_data/
+ingestion/staging/
+ingestion/oaugf_extracted/
+
+# Environment & Cloudflare Local State / Secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.wrangler/
+.cloudflare/

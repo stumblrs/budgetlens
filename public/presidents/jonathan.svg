@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Goodluck Ebele Jonathan">
+  <defs>
+    <linearGradient id="bg-gej" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1e3a8a"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <clipPath id="circle-gej">
+      <circle cx="100" cy="100" r="96"/>
+    </clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#bg-gej)" stroke="#60a5fa" stroke-width="4"/>
+  <g clip-path="url(#circle-gej)">
+    <!-- Resource Control Suit -->
+    <path d="M22 200 C25 148 56 135 100 135 C144 135 175 148 178 200 Z" fill="#0f172a"/>
+    <path d="M89 136 L100 170 L111 136 Z" fill="#e2e8f0"/>
+    <line x1="100" y1="142" x2="100" y2="188" stroke="#60a5fa" stroke-width="2"/>
+    <!-- Neck -->
+    <rect x="85" y="114" width="30" height="27" rx="10" fill="#6b3e26"/>
+    <!-- Face -->
+    <ellipse cx="100" cy="91" rx="33" ry="37" fill="#7c4b30"/>
+    <ellipse cx="66" cy="93" rx="4.5" ry="8.5" fill="#6b3e26"/>
+    <ellipse cx="134" cy="93" rx="4.5" ry="8.5" fill="#6b3e26"/>
+    <!-- Eyes & Smile -->
+    <circle cx="87" cy="84" r="2.8" fill="#0f172a"/>
+    <circle cx="113" cy="84" r="2.8" fill="#0f172a"/>
+    <path d="M80 78 Q87 74 94 78" fill="none" stroke="#1e293b" stroke-width="2.3" stroke-linecap="round"/>
+    <path d="M106 78 Q113 74 120 78" fill="none" stroke="#1e293b" stroke-width="2.3" stroke-linecap="round"/>
+    <path d="M90 107 Q100 114 110 107" fill="none" stroke="#3e2212" stroke-width="2.5" stroke-linecap="round"/>
+    <!-- Signature Niger Delta Fedora Hat -->
+    <path d="M52 66 Q100 54 148 66 Q100 73 52 66 Z" fill="#1e293b"/>
+    <path d="M68 63 L75 34 Q100 28 125 34 L132 63 Z" fill="#334155"/>
+    <path d="M69 57 L131 57" stroke="#93c5fd" stroke-width="3"/>
+  </g>
+</svg>

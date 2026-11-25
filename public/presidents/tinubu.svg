@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Bola Ahmed Tinubu">
+  <defs>
+    <linearGradient id="bg-bat" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#92400e"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <clipPath id="circle-bat">
+      <circle cx="100" cy="100" r="96"/>
+    </clipPath>
+  </defs>
+  <circle cx="100" cy="100" r="98" fill="url(#bg-bat)" stroke="#fbbf24" stroke-width="4"/>
+  <g clip-path="url(#circle-bat)">
+    <!-- Agbada Robe -->
+    <path d="M22 200 C25 148 56 135 100 135 C144 135 175 148 178 200 Z" fill="#0f172a"/>
+    <path d="M76 137 L100 176 L124 137" fill="none" stroke="#f59e0b" stroke-width="4"/>
+    <!-- Neck -->
+    <rect x="85" y="114" width="30" height="27" rx="10" fill="#6b3e26"/>
+    <!-- Face -->
+    <ellipse cx="100" cy="90" rx="34" ry="37" fill="#7d4d31"/>
+    <ellipse cx="65" cy="92" rx="4.5" ry="8.5" fill="#6b3e26"/>
+    <ellipse cx="135" cy="92" rx="4.5" ry="8.5" fill="#6b3e26"/>
+    <!-- Signature Thick-Rimmed Round Glasses -->
+    <circle cx="86" cy="83" r="10.5" fill="rgba(255,255,255,0.12)" stroke="#0f172a" stroke-width="3"/>
+    <circle cx="114" cy="83" r="10.5" fill="rgba(255,255,255,0.12)" stroke="#0f172a" stroke-width="3"/>
+    <line x1="96.5" y1="83" x2="103.5" y2="83" stroke="#0f172a" stroke-width="3"/>
+    <circle cx="86" cy="83" r="2.6" fill="#0f172a"/>
+    <circle cx="114" cy="83" r="2.6" fill="#0f172a"/>
+    <!-- Gray goatee / beard & calm mouth -->
+    <path d="M89 107 Q100 112 111 107" fill="none" stroke="#3e2212" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M88 115 Q100 123 112 115" fill="none" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+    <!-- Signature Embroidered Yoruba Cap with Broken-Shackle Motif -->
+    <path d="M66 63 L70 40 Q100 29 130 40 L134 63 Q100 54 66 63 Z" fill="#1e293b"/>
+    <path d="M90 48 Q95 43 100 48 Q105 53 110 48" fill="none" stroke="#fbbf24" stroke-width="2.8" stroke-linecap="round"/>
+    <path d="M67 58 Q100 51 133 58" fill="none" stroke="#f59e0b" stroke-width="2"/>
+  </g>
+</svg>
