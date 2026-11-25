@@ -10,7 +10,8 @@ export const aiRouter = new Hono<{ Bindings: WorkerEnv }>();
 
 const STOP_WORDS = new Set([
   'show', 'me', 'all', 'the', 'in', 'on', 'by', 'at', 'an', 'as', 'be', 'do', 'for',
-  'of', 'and', 'or', 'to', 'from', 'across',
+  'of', 'and', 'or', 'to', 'from', 'across', 'duplicate', 'duplicates', 'duplicated',
+  'repeated', 'identical', 'clone', 'clones', 'cluster', 'clusters',
   'compare', 'what', 'is', 'are', 'how', 'much', 'many', 'find', 'list', 'top',
   'highest', 'most', 'expensive', 'budget', 'projects', 'project', 'items', 'item',
   'spending', 'nigeria', 'federal', 'year', 'years', 'between', 'under', 'above',
@@ -155,7 +156,6 @@ async function handleAiQuery(rawBody: unknown, env: WorkerEnv | undefined) {
   }
 
   const lower = question.toLowerCase();
-  const scope = typeof body.scope === 'string' ? body.scope : null;
   const yearMatches = lower.match(/\b(1999|20[0-2]\d)\b/g) || [];
   const explicitYear =
     typeof body.financialYear === 'number' &&
@@ -164,9 +164,7 @@ async function handleAiQuery(rawBody: unknown, env: WorkerEnv | undefined) {
       ? body.financialYear
       : null;
   const targetYear =
-    scope === 'all'
-      ? null
-      : explicitYear ?? (yearMatches.length === 1 ? Number.parseInt(yearMatches[0], 10) : null);
+    explicitYear ?? (yearMatches.length === 1 ? Number.parseInt(yearMatches[0], 10) : null);
 
   let targetPres: string | null =
     typeof body.president === 'string' &&
@@ -183,7 +181,179 @@ async function handleAiQuery(rawBody: unknown, env: WorkerEnv | undefined) {
     }
   }
 
-  const ftsExpr = extractSearchKeywords(question);
+  const questionForFts =
+    targetYear !== null ? question.replace(/\b(1999|20[0-2]\d)\b/g, ' ') : question;
+  const ftsExpr = extractSearchKeywords(questionForFts);
+  const requestedMode = typeof body.mode === 'string' ? body.mode.trim().toLowerCase() : '';
+  const isDuplicateIntent =
+    requestedMode === 'duplicates' ||
+    /\b(duplicate|duplicates|duplicated|repeated|identical|clones?)\b/i.test(question);
+
+  if (isDuplicateIntent) {
+    const dupClauses: string[] = [];
+    const dupParams: unknown[] = [];
+    if (ftsExpr) {
+      dupClauses.push('budget_fts MATCH ?');
+      dupParams.push(ftsExpr);
+    }
+    if (targetYear !== null) {
+      dupClauses.push('r.financial_year = ?');
+      dupParams.push(targetYear);
+    }
+    if (targetPres) {
+      dupClauses.push('r.president = ?');
+      dupParams.push(targetPres);
+    }
+    const dupWhere = dupClauses.length > 0 ? `WHERE ${dupClauses.join(' AND ')}` : '';
+    const dupJoin = ftsExpr
+      ? 'FROM budget_fts f JOIN budget_records r ON r.rowid = f.rowid'
+      : 'FROM budget_records r';
+
+    const clusterGroupsRes = await dbBudgets
+      .prepare(
+        `
+        SELECT r.project_name, r.mda_name, r.financial_year, r.amount_naira,
+               COUNT(*) AS dup_count, SUM(r.amount_naira) AS sum_amt,
+               GROUP_CONCAT(r.id, ',') AS row_ids
+        ${dupJoin}
+        ${dupWhere}
+        GROUP BY r.project_name, r.mda_name, r.financial_year, r.amount_naira
+        HAVING COUNT(*) >= 2
+        ORDER BY sum_amt DESC
+        LIMIT 12
+        `
+      )
+      .bind(...dupParams)
+      .all<{
+        project_name: string;
+        mda_name: string;
+        financial_year: number;
+        amount_naira: number;
+        dup_count: number;
+        sum_amt: number;
+        row_ids: string;
+      }>();
+
+    const groups = clusterGroupsRes.results || [];
+    const sampleIds = Array.from(
+      new Set(
+        groups.flatMap((g) => (g.row_ids || '').split(',').filter(Boolean).slice(0, 3))
+      )
+    ).slice(0, 36);
+
+    const itemById = new Map<
+      string,
+      {
+        id: string;
+        code: string;
+        title: string;
+        amountNaira: number;
+        amount: string;
+        page: number;
+        agency: string;
+        year: number;
+        sector: string;
+        state: string;
+        severity: string;
+      }
+    >();
+    if (sampleIds.length > 0) {
+      const idPh = sampleIds.map(() => '?').join(', ');
+      const detailRes = await dbBudgets
+        .prepare(
+          `SELECT id, financial_year, project_code, project_name, mda_name, sector, amount_naira, pdf_page, state, severity
+           FROM budget_records WHERE id IN (${idPh})`
+        )
+        .bind(...sampleIds)
+        .all<{
+          id: string;
+          financial_year: number;
+          project_code: string;
+          project_name: string;
+          mda_name: string;
+          sector: string;
+          amount_naira: number;
+          pdf_page: number;
+          state: string;
+          severity: string;
+        }>();
+      for (const r of detailRes.results || []) {
+        itemById.set(r.id, {
+          id: r.id,
+          code: r.project_code || 'ERGP',
+          title: r.project_name,
+          amountNaira: Number(r.amount_naira),
+          amount: formatNairaShort(Number(r.amount_naira)),
+          page: Number(r.pdf_page),
+          agency: r.mda_name,
+          year: Number(r.financial_year),
+          sector: r.sector,
+          state: r.state,
+          severity: r.severity,
+        });
+      }
+    }
+
+    const duplicateClusters = groups.map((g, idx) => ({
+      clusterId: `DUP-${g.financial_year}-${idx + 1}`,
+      canonicalTitle: g.project_name,
+      count: Number(g.dup_count),
+      totalAmountNaira: Number(g.sum_amt),
+      agency: g.mda_name,
+      year: Number(g.financial_year),
+      items: (g.row_ids || '')
+        .split(',')
+        .filter(Boolean)
+        .map((id) => itemById.get(id))
+        .filter((x): x is NonNullable<typeof x> => Boolean(x)),
+    }));
+    const dupCitations = duplicateClusters.flatMap((cl) => cl.items.slice(0, 2)).slice(0, 12);
+    const totalClusterExposure = duplicateClusters.reduce(
+      (s, cl) => s + cl.totalAmountNaira,
+      0
+    );
+    const scopeLabel = targetYear ? `FY ${targetYear}` : '1999–2026 schedules';
+    const dupAnswer =
+      duplicateClusters.length > 0
+        ? sanitizePublicAiText(
+            `Found ${duplicateClusters.length.toLocaleString()} duplicate cluster(s) in ${scopeLabel} totaling ${formatNairaShort(totalClusterExposure)}.`
+          )
+        : `No multi-line duplicate clusters matched "${question}"${targetYear ? ` in FY ${targetYear}` : ''}.`;
+
+    const allowedDupAmounts = [
+      totalClusterExposure,
+      ...duplicateClusters.map((cl) => cl.totalAmountNaira),
+      ...dupCitations.map((c) => c.amountNaira),
+    ];
+    const allowedDupCodes = new Set<string>(
+      dupCitations.flatMap((c) => [c.code, c.id])
+    );
+    const dupGate = verifyGroundedResponse(dupAnswer, allowedDupAmounts, allowedDupCodes);
+
+    return {
+      status: 200 as const,
+      payload: {
+        available: true,
+        queryMode: 'duplicates',
+        answer: dupGate.verifiedText,
+        groundingVerified: dupGate.groundingVerified,
+        rejectedFigures: dupGate.rejectedFigures,
+        rejectedCodes: dupGate.rejectedCodes,
+        citations: dupCitations,
+        policyCitations: [],
+        duplicateClusters,
+        similarItems: [],
+        yearBreakdown: [],
+        totalMatches: duplicateClusters.length,
+        totalExposureNaira: totalClusterExposure,
+        datasetsConnected: {
+          fts5Sql: true,
+        },
+        elapsedMs: Date.now() - t0,
+      },
+    };
+  }
+
   const whereClauses: string[] = [];
   const params: unknown[] = [];
 

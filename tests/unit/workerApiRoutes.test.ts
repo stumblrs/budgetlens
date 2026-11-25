@@ -556,6 +556,25 @@ describe('Cloudflare Worker API Routes (P8-CP-3) against Real SQLite + FTS5', ()
     expect(redacted.groundingVerified).toBe(false);
     expect(redacted.verifiedText).toContain('[UNVERIFIED FIGURE REDACTED]');
     expect(redacted.verifiedText).toContain('[UNRETRIEVED CODE REDACTED]');
+
+    const dupRes = await app.request(
+      '/api/ai/query',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: 'Find duplicate projects in 2024', mode: 'duplicates' }),
+      },
+      env
+    );
+    expect(dupRes.status).toBe(200);
+    const dupBody = (await dupRes.json()) as {
+      queryMode: string;
+      answer: string;
+      duplicateClusters: unknown[];
+    };
+    expect(dupBody.queryMode).toBe('duplicates');
+    expect(dupBody.answer).toMatch(/No multi-line duplicate clusters matched|duplicate cluster/i);
+    expect(Array.isArray(dupBody.duplicateClusters)).toBe(true);
   });
 
   it('supports /tips with JPEG EXIF APP1 stripping, moderation auth, and /casebooks CRUD', async () => {

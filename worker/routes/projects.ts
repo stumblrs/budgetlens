@@ -124,6 +124,8 @@ projectsRouter.get('/projects', async (c) => {
   }
 
   const yearRaw = c.req.query('year');
+  const pageRaw = c.req.query('page');
+  const codeRaw = (c.req.query('code') || '').trim();
   const mda = (c.req.query('mda') || '').trim();
   const sector = (c.req.query('sector') || '').trim();
   const state = (c.req.query('state') || '').trim();
@@ -154,6 +156,18 @@ projectsRouter.get('/projects', async (c) => {
     }
     whereClauses.push('r.financial_year = ?');
     params.push(yr);
+  }
+  if (pageRaw) {
+    const pg = Number.parseInt(pageRaw, 10);
+    if (!Number.isFinite(pg) || pg < 1) {
+      return c.json({ ok: false, error: 'Invalid page filter' }, 400);
+    }
+    whereClauses.push('r.pdf_page = ?');
+    params.push(pg);
+  }
+  if (codeRaw) {
+    whereClauses.push('LOWER(r.project_code) = ?');
+    params.push(codeRaw.toLowerCase());
   }
   if (mda && mda.toUpperCase() !== 'ALL') {
     whereClauses.push('LOWER(r.mda_name) LIKE ?');

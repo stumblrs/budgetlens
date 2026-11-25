@@ -140,8 +140,13 @@ def find_local_sqlite_files() -> dict[str, Path]:
     return mapping
 
 
+def get_datasets_dir() -> Path:
+    archived = ROOT / "data_archive" / "datasets"
+    return archived if archived.exists() else (ROOT / "public" / "datasets")
+
+
 def iter_app_dataset_blobs() -> Iterable[tuple[str, str]]:
-    datasets_dir = ROOT / "public" / "datasets"
+    datasets_dir = get_datasets_dir()
     for name in TOP_LEVEL_APP_DATASETS:
         fp = datasets_dir / f"{name}.json"
         if fp.exists():
@@ -166,14 +171,14 @@ def split_chunks(text: str, max_chars: int = MAX_CHUNK_CHARS) -> list[str]:
 
 
 def iter_year_statistics() -> Iterable[tuple[int, str]]:
-    datasets_dir = ROOT / "public" / "datasets"
+    datasets_dir = get_datasets_dir()
     for p in sorted(datasets_dir.glob("[0-9][0-9][0-9][0-9]/statistics.json")):
         year = int(p.parent.name)
         yield year, p.read_text(encoding="utf-8")
 
 
 def load_year_enrichment(year: int) -> dict[str, dict[str, Any]]:
-    rec_path = ROOT / "public" / "datasets" / "db" / str(year) / "records.json"
+    rec_path = get_datasets_dir() / "db" / str(year) / "records.json"
     if not rec_path.exists():
         return {}
     raw = json.loads(rec_path.read_text(encoding="utf-8"))
@@ -430,10 +435,11 @@ def seed_local_app(target_sqlite: Path) -> dict[str, int]:
                 chunk_count_total += len(parts)
             ds_count += 1
 
+        datasets_dir = get_datasets_dir()
         bad_years = 0
         bad_items_total = 0
         for bp in sorted(
-            (ROOT / "public" / "datasets" / "bill_act_diffs").glob("[0-9][0-9][0-9][0-9].json")
+            (datasets_dir / "bill_act_diffs").glob("[0-9][0-9][0-9][0-9].json")
         ):
             data = json.loads(bp.read_text(encoding="utf-8"))
             year = int(data.get("financialYear") or bp.stem)
@@ -465,7 +471,7 @@ def seed_local_app(target_sqlite: Path) -> dict[str, int]:
             bad_items_total += len(batch)
 
         contractor_rows = []
-        for cp in sorted((ROOT / "public" / "datasets" / "contractor_history").glob("*.json")):
+        for cp in sorted((datasets_dir / "contractor_history").glob("*.json")):
             shard = json.loads(cp.read_text(encoding="utf-8"))
             if not isinstance(shard, dict):
                 continue
@@ -491,7 +497,7 @@ def seed_local_app(target_sqlite: Path) -> dict[str, int]:
         )
 
         oaugf_rows = []
-        for op in sorted((ROOT / "public" / "datasets" / "oaugf_issues").glob("*.json")):
+        for op in sorted((datasets_dir / "oaugf_issues").glob("*.json")):
             shard = json.loads(op.read_text(encoding="utf-8"))
             bucket = str(shard.get("bucket") or op.stem)
             for idx, issue in enumerate(shard.get("issues") or []):

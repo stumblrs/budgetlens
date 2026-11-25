@@ -12,7 +12,7 @@ export default {
   worker: {
     name: 'budgetlens',
     entrypoint: './worker/index.ts',
-    compatibilityDate: '2026-11-25',
+    compatibilityDate: '2026-09-21',
     compatibilityFlags: ['nodejs_compat'],
     observability: {
       enabled: true,
