@@ -6,13 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:ui": "tsc -b && vite build --mode ui",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "worker:typecheck": "tsc -p worker/tsconfig.json --noEmit",
-    "cf:dev": "cf dev",
-    "cf:build": "cf build",
-    "cf:deploy": "cf deploy"
+    "cf:dev": "node ./node_modules/@cloudflare/vite-plugin/bin/cf-vite dev --local",
+    "cf:build": "node ./node_modules/@cloudflare/vite-plugin/bin/cf-vite build",
+    "cf:deploy": "cf deploy",
+    "d1:seed:local": "python scripts/seed_cloudflare_d1.py --local",
+    "d1:seed:remote-init": "python scripts/seed_cloudflare_d1.py --remote-init"
   },
   "dependencies": {
     "docx": "^9.16.0",
