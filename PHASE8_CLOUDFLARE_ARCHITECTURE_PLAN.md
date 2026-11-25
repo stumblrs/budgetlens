@@ -1,6 +1,6 @@
 # BudgetLens Phase 8 — Cloudflare Free-Tier Separation & Migration Plan
 
-> **Document Status:** `P8-CP-4 COMPLETED`  
+> **Document Status:** `P8-CP-5 COMPLETED`  
 > **Created:** `2026-11-25`  
 > **Target Runtime:** 100% Cloudflare Free Tier (`\$0` · No credit card required; R2 deferred until permanent account)  
 > **Predecessor:** [PHASE8_BACKEND_HANDOFF_SPECIFICATION.md](file:///c:/Users/lol/Downloads/Projetcs/buget_lens/PHASE8_BACKEND_HANDOFF_SPECIFICATION.md)
@@ -26,7 +26,7 @@
 | **`P8-CP-2`** | Create D1 SQL migrations & idempotent local seed script from `backend/data/*.sqlite` + Phase 7 summaries | `worker/migrations/`, `scripts/seed_cloudflare_d1.py` | Local D1 migration + exact row-count parity assertions | `COMPLETED` |
 | **`P8-CP-3`** | Implement paginated `/api/v1/*` endpoints (`years`, `projects`, `search`, `mdas`, `forensics`, `debt`, `cbn`, `ai`, `tips`, `casebooks`) | `worker/routes/*` | API contract & FTS5 query latency unit/integration tests | `COMPLETED` |
 | **`P8-CP-4`** | Refactor UI to pure thin API calls, relocate `public/datasets/` to local `data_archive/` so `vite build` ships `< 5 MB` | `src/services/*`, UI explorers, `package.json` | `npm run build` `< 5 MB` assets + mobile Playwright `360px`/`390px` | `COMPLETED` |
-| **`P8-CP-5`** | Live Free-Tier `cf deploy`, 4-viewport Playwright E2E, & `CLOUDFLARE_MIGRATION_RUNBOOK.md` | `cloudflare.config.ts`, E2E suite | Live `*.workers.dev` smoke + account migration dry run | `PLANNED` |
+| **`P8-CP-5`** | Live Free-Tier `cf deploy`, 4-viewport Playwright E2E, & `CLOUDFLARE_MIGRATION_RUNBOOK.md` | `cloudflare.config.ts`, E2E suite | Live `*.workers.dev` smoke + account migration dry run | `COMPLETED` |
 
 ---
 
