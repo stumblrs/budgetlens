@@ -1,13 +1,15 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { WorkerEnv } from './lib/d1Helpers';
+import { aiRouter } from './routes/ai';
+import { civicRouter } from './routes/civic';
+import { debtAndCbnRouter } from './routes/debtAndCbn';
+import { mdasAndForensicsRouter } from './routes/mdasAndForensics';
+import { projectsRouter } from './routes/projects';
+import { searchRouter } from './routes/search';
+import { yearsRouter } from './routes/years';
 
-export interface WorkerEnv {
-  DB_BUDGETS?: D1Database;
-  DB_LEDGERS?: D1Database;
-  DB_APP?: D1Database;
-  ASSETS?: Fetcher;
-  ENVIRONMENT?: string;
-}
+export type { WorkerEnv };
 
 export const app = new Hono<{ Bindings: WorkerEnv }>();
 
@@ -15,8 +17,8 @@ app.use(
   '/api/*',
   cors({
     origin: '*',
-    allowMethods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Admin-Key', 'X-Share-Token'],
   })
 );
 
@@ -40,7 +42,10 @@ app.onError((err, c) => {
   );
 });
 
-async function countTableRows(db: D1Database | undefined, table: 'budget_records' | 'nocopo_contracts' | 'app_datasets'): Promise<number | null> {
+async function countTableRows(
+  db: D1Database | undefined,
+  table: 'budget_records' | 'nocopo_contracts' | 'app_datasets'
+): Promise<number | null> {
   if (!db) return null;
   try {
     const row = await db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).first<{ count: number }>();
@@ -50,10 +55,16 @@ async function countTableRows(db: D1Database | undefined, table: 'budget_records
   }
 }
 
-app.get('/api/v1/health', async (c) => {
+async function healthHandler(c: {
+  env?: WorkerEnv;
+  req: { query: (k: string) => string | undefined };
+  json: (data: unknown, status?: number) => Response;
+}) {
   const deep = c.req.query('deep') === '1';
   const payload: {
     ok: boolean;
+    status: string;
+    ftsDbReady: boolean;
     service: string;
     runtime: string;
     environment: string;
@@ -69,6 +80,8 @@ app.get('/api/v1/health', async (c) => {
     };
   } = {
     ok: true,
+    status: 'ok',
+    ftsDbReady: Boolean(c.env?.DB_BUDGETS),
     service: 'budgetlens-api',
     runtime: 'cloudflare-workers',
     environment: c.env?.ENVIRONMENT || 'development',
@@ -89,29 +102,22 @@ app.get('/api/v1/health', async (c) => {
   }
 
   return c.json(payload);
-});
-
-const PENDING_ENDPOINTS = [
-  '/api/v1/years',
-  '/api/v1/projects',
-  '/api/v1/search',
-  '/api/v1/debt',
-  '/api/v1/cbn',
-];
-
-for (const route of PENDING_ENDPOINTS) {
-  app.all(route, (c) =>
-    c.json(
-      {
-        ok: false,
-        status: 501,
-        endpoint: route,
-        error: 'Not Implemented — D1 database seeding and query handlers pending in P8-CP-2 / P8-CP-3.',
-      },
-      501
-    )
-  );
 }
+
+app.get('/api/v1/health', healthHandler);
+app.get('/api/health', healthHandler);
+
+const apiRoutes = new Hono<{ Bindings: WorkerEnv }>();
+apiRoutes.route('/', yearsRouter);
+apiRoutes.route('/', projectsRouter);
+apiRoutes.route('/', searchRouter);
+apiRoutes.route('/', mdasAndForensicsRouter);
+apiRoutes.route('/', debtAndCbnRouter);
+apiRoutes.route('/', aiRouter);
+apiRoutes.route('/', civicRouter);
+
+app.route('/api/v1', apiRoutes);
+app.route('/api', apiRoutes);
 
 app.all('/api/*', (c) =>
   c.json(

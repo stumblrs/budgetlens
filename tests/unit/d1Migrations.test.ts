@@ -40,6 +40,11 @@ const MIGRATION_SPECS = [
       'casebooks',
     ],
   },
+  {
+    name: 'app_0002_tip_photos',
+    path: resolve(process.cwd(), 'worker/migrations/app/0002_tip_photos.sql'),
+    requiredTables: ['tip_photos', 'idx_tip_photos_tip'],
+  },
 ];
 
 describe('Cloudflare D1 Migrations & Health Probe (P8-CP-2)', () => {

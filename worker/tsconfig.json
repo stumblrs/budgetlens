@@ -12,5 +12,10 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["./**/*.ts"]
+  "include": [
+    "./**/*.ts",
+    "../src/data/cbnGovernors.ts",
+    "../src/data/presidentialTerms.ts",
+    "../src/utils/administrationDebt.ts"
+  ]
 }
