@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl } from '../services/apiClient';
 import {
   X,
   ShieldCheck,
@@ -96,9 +97,6 @@ interface FieldTipRecord {
   moderation_note?: string;
   created_at_iso: string;
 }
-
-const TIPS_API_BASE =
-  ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
 const CITIZEN_TIP_LEGAL_BANNER =
   'Citizen Field Observation (Unverified Independent Report — Subject to Corroboration & Official BPP/Contractor Right-of-Reply)';
@@ -311,7 +309,7 @@ export const ProjectEvidenceModal: React.FC<ProjectEvidenceProps> = ({
     if (activeSubTab !== 'action') return;
     let cancelled = false;
     fetch(
-      `${TIPS_API_BASE}/api/tips?project_id=${encodeURIComponent(project.id || projectCode)}&year=${effectiveYear}`
+      apiUrl(`/api/tips?project_id=${encodeURIComponent(project.id || projectCode)}&year=${effectiveYear}`)
     )
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
       .then((data) => {
@@ -349,7 +347,7 @@ export const ProjectEvidenceModal: React.FC<ProjectEvidenceProps> = ({
       for (const file of tipPhotos.slice(0, 3)) {
         form.append('photos', file);
       }
-      const res = await fetch(`${TIPS_API_BASE}/api/tips`, {
+      const res = await fetch(apiUrl('/api/tips'), {
         method: 'POST',
         body: form,
       });
@@ -380,7 +378,7 @@ export const ProjectEvidenceModal: React.FC<ProjectEvidenceProps> = ({
   const handleCorroborate = async (tipId: string) => {
     setCorroboratingId(tipId);
     try {
-      const res = await fetch(`${TIPS_API_BASE}/api/tips/${encodeURIComponent(tipId)}/corroborate`, {
+      const res = await fetch(apiUrl(`/api/tips/${encodeURIComponent(tipId)}/corroborate`), {
         method: 'POST',
       });
       if (res.ok) {

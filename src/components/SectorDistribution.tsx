@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   ResponsiveContainer,
   PieChart,
@@ -145,7 +146,7 @@ export const SectorDistribution: React.FC<SectorDistributionProps> = ({
 
     const loadStats = async (yr: number): Promise<RawYearStats | null> => {
       try {
-        const res = await fetch(`/datasets/${yr}/statistics.json`);
+        const res = await fetch(datasetUrl(`/datasets/${yr}/statistics.json`));
         if (!res.ok) return null;
         return (await res.json()) as RawYearStats;
       } catch {

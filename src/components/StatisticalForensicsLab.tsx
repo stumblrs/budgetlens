@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   ArrowLeftRight,
@@ -440,7 +441,7 @@ export const StatisticalForensicsLab: React.FC<StatisticalForensicsLabProps> = (
 
   useEffect(() => {
     let active = true;
-    fetch('/datasets/govspend_forensics.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/govspend_forensics.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => {
         if (active && d) setGovForensics(d);
@@ -455,7 +456,7 @@ export const StatisticalForensicsLab: React.FC<StatisticalForensicsLabProps> = (
     if (subTab !== 'govspend') return;
     let active = true;
     if (!vendorPersonalData) {
-      fetch('/datasets/vendor_network_index.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/vendor_network_index.json'), { cache: 'no-cache' })
         .then((res) => (res.ok ? res.json() : null))
         .then((d) => {
           if (active && d) setVendorPersonalData(d);

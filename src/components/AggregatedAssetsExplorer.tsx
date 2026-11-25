@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   Activity,
   AlertTriangle,
@@ -134,7 +135,7 @@ export const AggregatedAssetsExplorer: React.FC<AggregatedAssetsExplorerProps> =
     let mounted = true;
     setLoading(true);
     Promise.all([
-      fetch('/datasets/asset_inventory_index.json', { cache: 'no-store' })
+      fetch(datasetUrl('/datasets/asset_inventory_index.json'), { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
       loadOaugfAuditIndex(),

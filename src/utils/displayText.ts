@@ -6,6 +6,8 @@
  * source project descriptions, PDF citations, and SHA-256 digests unaltered.
  */
 
+import { fetchDataset } from '../services/apiClient';
+
 export type CoverageTier = 'FULL_SCHEDULE' | 'PARTIAL_SCHEDULE' | 'SUMMARY_ACT_ONLY';
 export type CoverageTone = 'emerald' | 'amber' | 'slate' | 'blue';
 
@@ -296,8 +298,7 @@ export function getCoverageCaveatMeta(
 export async function loadCoverageAuditIndex(): Promise<CoverageAuditIndexPayload | null> {
   if (typeof fetch !== 'function') return null;
   if (!cachedCoverageAuditPromise) {
-    cachedCoverageAuditPromise = fetch('/datasets/coverage_audit.json', { cache: 'no-cache' })
-      .then((res) => (res.ok ? (res.json() as Promise<CoverageAuditIndexPayload>) : null))
+    cachedCoverageAuditPromise = fetchDataset<CoverageAuditIndexPayload>('coverage_audit')
       .catch(() => null);
   }
   return cachedCoverageAuditPromise;

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   Bar,
   BarChart,
@@ -87,7 +88,7 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
 
   const loadDebt = React.useCallback(() => {
     setLoadingDebt(true);
-    fetch('/datasets/debt_profile.json', { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { totalDocumentsIndexed?: number; yearlyDebt?: DmoYearRow[] } | null) => {
         if (data?.yearlyDebt) {

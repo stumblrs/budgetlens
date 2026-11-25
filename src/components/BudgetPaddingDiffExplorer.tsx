@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -205,7 +206,7 @@ export const BudgetPaddingDiffExplorer: React.FC<BudgetPaddingDiffExplorerProps>
 
   useEffect(() => {
     let active = true;
-    fetch('/datasets/bill_act_diffs/index.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/bill_act_diffs/index.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: BillActDiffIndex | null) => {
         if (!active || !data) return;
@@ -229,7 +230,7 @@ export const BudgetPaddingDiffExplorer: React.FC<BudgetPaddingDiffExplorerProps>
   useEffect(() => {
     let active = true;
     Promise.all([
-      fetch('/datasets/follow_the_money_links.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/follow_the_money_links.json'), { cache: 'no-cache' })
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
       loadOaugfAuditIndex(),
@@ -256,7 +257,7 @@ export const BudgetPaddingDiffExplorer: React.FC<BudgetPaddingDiffExplorerProps>
     if (!activeCycleYear) return;
     let active = true;
     setLoading(true);
-    fetch(`/datasets/bill_act_diffs/${activeCycleYear}.json`, { cache: 'no-cache' })
+    fetch(datasetUrl(`/datasets/bill_act_diffs/${activeCycleYear}.json`), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: BillActYearDataset | null) => {
         if (active && data) setYearDataset(data);

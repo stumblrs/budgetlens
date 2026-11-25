@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import { Building2, ExternalLink, Info, Network, Search, ShieldAlert } from 'lucide-react';
 import { ExpandableText } from './ExpandableText';
 import type { ContractorSummaryItem } from './ContractorHistoryModal';
@@ -44,7 +45,7 @@ export const VendorCaptureNetworkView: React.FC<VendorCaptureNetworkViewProps> =
   useEffect(() => {
     let active = true;
     setLoading(true);
-    fetch('/datasets/vendor_network_index.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/vendor_network_index.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? (res.json() as Promise<VendorNetworkPayload>) : null))
       .then((json) => {
         if (active && json) setData(json);

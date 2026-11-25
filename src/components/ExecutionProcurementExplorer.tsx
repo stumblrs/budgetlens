@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl, datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   Building2,
@@ -386,27 +387,27 @@ export const ExecutionProcurementExplorer: React.FC<ExecutionProcurementExplorer
   const [exportingFormat, setExportingFormat] = useState<'pdf' | 'docx' | null>(null);
 
   useEffect(() => {
-    fetch('/datasets/execution_tracker.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/execution_tracker.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => d && setExecData(d))
       .catch(() => { });
 
-    fetch('/datasets/procurement_links.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/procurement_links.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => d && setProcData(d))
       .catch(() => { });
 
-    fetch('/datasets/govspend_summary.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/govspend_summary.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => d && setGovData(d))
       .catch(() => { });
 
-    fetch('/datasets/contractors_leaderboard.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/contractors_leaderboard.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => d && setContractorsData(d))
       .catch(() => { });
 
-    fetch('/datasets/procurement_risk_index.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/procurement_risk_index.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((d) => d && setRiskData(d))
       .catch(() => { });
@@ -422,7 +423,7 @@ export const ExecutionProcurementExplorer: React.FC<ExecutionProcurementExplorer
     const timer = setTimeout(() => {
       const qs = new URLSearchParams({ limit: '40' });
       if (trimmed) qs.set('q', trimmed);
-      fetch(`/api/procurement/search?${qs.toString()}`, { signal: ctrl.signal })
+      fetch(apiUrl(`/api/procurement/search?${qs.toString()}`), { signal: ctrl.signal })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => {
           if (d?.available && Array.isArray(d.results)) {
@@ -506,7 +507,7 @@ export const ExecutionProcurementExplorer: React.FC<ExecutionProcurementExplorer
     const timer = setTimeout(() => {
       const qs = new URLSearchParams({ limit: '40' });
       if (trimmed) qs.set('q', trimmed);
-      fetch(`/api/expenditures/search?${qs.toString()}`, { signal: ctrl.signal })
+      fetch(apiUrl(`/api/expenditures/search?${qs.toString()}`), { signal: ctrl.signal })
         .then((r) => (r.ok ? r.json() : null))
         .then((d) => {
           if (d?.available && Array.isArray(d.results)) {

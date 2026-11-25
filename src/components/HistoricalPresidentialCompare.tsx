@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   BarChart,
   Bar,
@@ -96,7 +97,7 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
   >({});
 
   const loadDebtProfile = React.useCallback(() => {
-    return fetch('/datasets/debt_profile.json', { cache: 'no-store' })
+    return fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { totalDocumentsIndexed?: number; yearlyDebt?: DmoYearRow[] } | null) => {
         if (!data?.yearlyDebt) return;
@@ -168,7 +169,7 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
 
   useEffect(() => {
     let active = true;
-    fetch('/datasets/macro_narratives_summary.json', { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/macro_narratives_summary.json'), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { narratives?: Array<{ financialYear: number; budgetTheme?: string; macroeconomicFramework?: { benchmarkOilPriceUSD?: number | null; exchangeRateNairaPerUSD?: number | null } }> } | null) => {
         if (!active || !data?.narratives) return;
@@ -189,7 +190,7 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
       if (active && mc) setMacroCredibility(mc);
     });
 
-    fetch('/datasets/forensic_sweep_1999_2026.json', { cache: 'no-cache' })
+    fetch(datasetUrl('/datasets/forensic_sweep_1999_2026.json'), { cache: 'no-cache' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { presidents?: Array<{ presidentId: string; crossLedgerProfile?: PresidentCrossLedgerSummary }> } | null) => {
         if (!active || !Array.isArray(data?.presidents)) return;

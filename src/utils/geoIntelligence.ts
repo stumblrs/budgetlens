@@ -2,6 +2,7 @@ import { lookupOaugfMdaFindings, type OaugfAuditIndexPayload } from './mdaScorec
 import { lookupMdaRiskProfile, type CrossLedgerContextWire } from './evidenceEngineV3';
 import { extractCanonicalProjectCode } from './ruleEngine';
 import { isZonalInterventionItem } from './billActDiff';
+import { fetchDataset } from '../services/apiClient';
 
 export interface GeoProjectStub {
   id: string;
@@ -157,9 +158,9 @@ let cachedGeoIndexPromise: Promise<GeoIntelligenceIndexPayload | null> | null = 
 
 export function loadGeoIntelligenceIndex(): Promise<GeoIntelligenceIndexPayload | null> {
   if (!cachedGeoIndexPromise) {
-    cachedGeoIndexPromise = fetch('/datasets/geo_intelligence_index.json')
-      .then((res) => (res.ok ? (res.json() as Promise<GeoIntelligenceIndexPayload>) : null))
-      .catch(() => null);
+    cachedGeoIndexPromise = fetchDataset<GeoIntelligenceIndexPayload>(
+      'geo_intelligence_index'
+    ).catch(() => null);
   }
   return cachedGeoIndexPromise;
 }

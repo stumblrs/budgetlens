@@ -5,6 +5,8 @@
  * and 64 deterministic FNV-1a shards under `/datasets/project_lifecycle/{00..63}.json`.
  */
 
+import { apiUrl, fetchDataset } from '../services/apiClient';
+
 export type MtefStageStatus = 'EXACT_YEAR_MTEF' | 'NO_MTEF_BENCHMARK';
 
 export interface MtefStageData {
@@ -733,30 +735,16 @@ export function computePaidOnPaperStatus(
 }
 
 let cachedIndexPromise: Promise<ProjectLifecycleIndex | null> | null = null;
-const shardCache = new Map<string, Promise<LifecycleShardPayload | null>>();
 
 export function resetLifecycleClientCache(): void {
   cachedIndexPromise = null;
-  shardCache.clear();
 }
 
 export function loadProjectLifecycleIndex(): Promise<ProjectLifecycleIndex | null> {
   if (!cachedIndexPromise) {
-    cachedIndexPromise = fetch('/datasets/project_lifecycle_index.json', { cache: 'no-cache' })
-      .then((res) => (res.ok ? (res.json() as Promise<ProjectLifecycleIndex>) : null))
-      .catch(() => null);
+    cachedIndexPromise = fetchDataset<ProjectLifecycleIndex>('project_lifecycle_index').catch(() => null);
   }
   return cachedIndexPromise;
-}
-
-function loadLifecycleShard(bucket: string): Promise<LifecycleShardPayload | null> {
-  if (!shardCache.has(bucket)) {
-    const p = fetch(`/datasets/project_lifecycle/${bucket}.json`, { cache: 'no-cache' })
-      .then((res) => (res.ok ? (res.json() as Promise<LifecycleShardPayload>) : null))
-      .catch(() => null);
-    shardCache.set(bucket, p);
-  }
-  return shardCache.get(bucket)!;
 }
 
 export function lookupScrutinyBadge(
@@ -800,75 +788,61 @@ export async function loadProjectLifecycleForRecord(target: {
   financialYear: number;
   agency?: string | null;
 }): Promise<ResolvedProjectLifecycle | null> {
-  const index = await loadProjectLifecycleIndex();
-  if (!index) return null;
-
   const fy = target.financialYear;
-  const mtef = index.mtefByYear?.[String(fy)] || defaultNoMtefStage(fy);
   const ridUp = String(target.id || '').trim().toUpperCase();
   const ucode =
     isUniqueProjectCode(target.projectCode) || isUniqueProjectCode(target.projectName);
 
-  let byIdHit: ProjectLifecycleRecord | undefined;
-  if (ridUp) {
-    const shard = await loadLifecycleShard(getLifecycleShardBucket(ridUp));
-    byIdHit = shard?.byRecordId?.[ridUp];
+  try {
+    const lookupId = encodeURIComponent(ridUp || ucode || 'lookup');
+    const qs = new URLSearchParams({ year: String(fy) });
+    if (ucode) qs.set('code', ucode);
+    if (target.agency) qs.set('mda', target.agency);
+    const res = await fetch(apiUrl(`/api/v1/projects/${lookupId}/lifecycle?${qs.toString()}`), {
+      cache: 'no-cache',
+    });
+    if (res.ok) {
+      const apiLc = await res.json();
+      if (apiLc?.ok) {
+        const pop = computePaidOnPaperStatus(apiLc.nocopo || [], apiLc.govspend || []);
+        return {
+          financialYear: fy,
+          recordId: apiLc.recordId || ridUp || ucode || 'RECORD',
+          projectCode: apiLc.projectCode || ucode,
+          paidOnPaperPriority: apiLc.paidOnPaperPriority || pop.paidOnPaperPriority,
+          paidOnPaperTier: apiLc.paidOnPaperTier || pop.paidOnPaperTier,
+          paidOnPaperReason: apiLc.paidOnPaperReason || pop.paidOnPaperReason,
+          verifiedDisbursedNaira: apiLc.verifiedDisbursedNaira ?? pop.verifiedDisbursedNaira,
+          mtef: apiLc.mtef || defaultNoMtefStage(fy),
+          billDiff: apiLc.billDiff || {
+            status: 'NO_BILL_DIFF_CYCLE',
+            cycleAvailable: false,
+          },
+          bir: apiLc.bir || { status: 'NO_BIR_REPORT', financialYear: fy },
+          nocopo: apiLc.nocopo || [],
+          govspend: apiLc.govspend || [],
+          matchedVia: apiLc.nocopo?.length
+            ? 'BY_RECORD_ID'
+            : ucode
+              ? 'BY_PROJECT_CODE'
+              : 'SYNTHESIZED_MACRO_BIR',
+        };
+      }
+    }
+  } catch {
+    // Fall through to compact index-level synthesis
   }
 
-  if (byIdHit) {
-    const pop = computePaidOnPaperStatus(byIdHit.nocopo, byIdHit.govspend);
-    return {
-      financialYear: fy,
-      recordId: byIdHit.recordId,
-      projectCode: byIdHit.projectCode || ucode,
-      paidOnPaperPriority: byIdHit.paidOnPaperPriority || pop.paidOnPaperPriority,
-      paidOnPaperTier: byIdHit.paidOnPaperTier || pop.paidOnPaperTier,
-      paidOnPaperReason: byIdHit.paidOnPaperReason || pop.paidOnPaperReason,
-      verifiedDisbursedNaira: byIdHit.verifiedDisbursedNaira || pop.verifiedDisbursedNaira,
-      mtef,
-      billDiff: byIdHit.billDiff,
-      bir:
-        byIdHit.bir?.status === 'MATCHED_MDA'
-          ? byIdHit.bir
-          : matchBirMdaEntry(index.birByYear?.[String(fy)], target.agency || byIdHit.agency),
-      nocopo: byIdHit.nocopo,
-      govspend: byIdHit.govspend,
-      matchedVia: 'BY_RECORD_ID',
-    };
-  }
+  const index = await loadProjectLifecycleIndex();
+  if (!index) return null;
 
-  let byCodeHit: CodeLifecycleFallback | undefined;
-  if (ucode) {
-    const cShard = await loadLifecycleShard(getLifecycleShardBucket(ucode));
-    byCodeHit = cShard?.byCode?.[ucode];
-  }
-
+  const mtef = index.mtefByYear?.[String(fy)] || defaultNoMtefStage(fy);
   const bir = matchBirMdaEntry(index.birByYear?.[String(fy)], target.agency);
   const diffCycles = index.diffCyclesAvailable || [];
   const defaultDiff: BillDiffStageData = {
     status: diffCycles.includes(fy) ? 'NOT_IN_ALTERED_DIFF' : 'NO_BILL_DIFF_CYCLE',
     cycleAvailable: diffCycles.includes(fy),
   };
-
-  if (byCodeHit) {
-    const pop = computePaidOnPaperStatus(byCodeHit.nocopo, byCodeHit.govspend);
-    return {
-      financialYear: fy,
-      recordId: ridUp || byCodeHit.recordId || ucode,
-      projectCode: ucode,
-      paidOnPaperPriority: byCodeHit.paidOnPaperPriority || pop.paidOnPaperPriority,
-      paidOnPaperTier: byCodeHit.paidOnPaperTier || pop.paidOnPaperTier,
-      paidOnPaperReason: byCodeHit.paidOnPaperReason || pop.paidOnPaperReason,
-      verifiedDisbursedNaira: byCodeHit.verifiedDisbursedNaira || pop.verifiedDisbursedNaira,
-      mtef,
-      billDiff:
-        byCodeHit.billDiff && byCodeHit.financialYear === fy ? byCodeHit.billDiff : defaultDiff,
-      bir,
-      nocopo: byCodeHit.nocopo,
-      govspend: byCodeHit.govspend,
-      matchedVia: 'BY_PROJECT_CODE',
-    };
-  }
 
   return {
     financialYear: fy,

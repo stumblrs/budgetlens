@@ -1,4 +1,5 @@
 import { getMacroForYear, HISTORICAL_MACRO_DATA } from '../data/historicalMacroData';
+import { apiUrl, fetchApiJson, fetchDataset } from './apiClient';
 import {
   ASSET_CATEGORY_META,
   BenfordAnalysisResult,
@@ -162,9 +163,6 @@ class BudgetDatabaseEngine {
     }
 
     const toPreload = [this.activeYear];
-    if (years.includes(this.activeYear - 1)) {
-      toPreload.push(this.activeYear - 1);
-    }
     await Promise.all(toPreload.map((y) => this.loadYearRecords(y)));
   }
 
@@ -189,9 +187,8 @@ class BudgetDatabaseEngine {
     generatedAt: string;
   }> {
     try {
-      const res = await fetch(`/datasets/registry.json?t=${Date.now()}`, { cache: 'no-store' });
-      if (!res.ok) return { changed: false, changedYears: [], generatedAt: this.lastRegistryGeneratedAt };
-      const raw = await res.json();
+      const raw = await fetchDataset<any>('registry', true);
+      if (!raw) return { changed: false, changedYears: [], generatedAt: this.lastRegistryGeneratedAt };
       const docs: RegistryDocument[] = Array.isArray(raw)
         ? raw.map((d: any) => ({
             financial_year: d.financialYear ?? d.financial_year,
@@ -295,12 +292,12 @@ class BudgetDatabaseEngine {
       return this.forensicsData;
     }
     try {
-      const url = forceRefresh
-        ? `/datasets/statistical_forensics_1999_2026.json?t=${Date.now()}`
-        : '/datasets/statistical_forensics_1999_2026.json';
-      const res = await fetch(url, forceRefresh ? { cache: 'no-store' } : undefined);
-      if (res.ok) {
-        this.forensicsData = await res.json();
+      const data = await fetchDataset<PrecomputedStatisticalForensics>(
+        'statistical_forensics_1999_2026',
+        forceRefresh
+      );
+      if (data) {
+        this.forensicsData = data;
         return this.forensicsData;
       }
     } catch (err) {
@@ -335,12 +332,9 @@ class BudgetDatabaseEngine {
 
   private async loadSummary(forceRefresh: boolean = false): Promise<void> {
     try {
-      const url = forceRefresh
-        ? `/datasets/db/hierarchy_summary.json?t=${Date.now()}`
-        : '/datasets/db/hierarchy_summary.json';
-      const res = await fetch(url, forceRefresh ? { cache: 'no-store' } : undefined);
-      if (res.ok) {
-        this.summaryData = await res.json();
+      const data = await fetchDataset<HierarchySummary>('db/hierarchy_summary', forceRefresh);
+      if (data) {
+        this.summaryData = data;
         this.availableYears = this.discoverAvailableYears();
       }
     } catch (err) {
@@ -359,12 +353,12 @@ class BudgetDatabaseEngine {
 
     this.loadingYears.add(year);
     try {
-      const url = forceRefresh
-        ? `/datasets/db/${year}/records.json?t=${Date.now()}`
-        : `/datasets/db/${year}/records.json`;
-      const res = await fetch(url, forceRefresh ? { cache: 'no-store' } : undefined);
-      if (res.ok) {
-        const records: BudgetRecord[] = await res.json();
+      const data = await fetchApiJson<{ items?: BudgetRecord[] } | BudgetRecord[]>(
+        apiUrl(`/api/v1/projects?year=${year}&format=record&limit=200`),
+        forceRefresh ? { cache: 'no-store' } : undefined
+      );
+      const records = Array.isArray(data) ? data : (data?.items || []);
+      if (records.length > 0) {
         this.recordsByYear.set(year, records);
         return records;
       }

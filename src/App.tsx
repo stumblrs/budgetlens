@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
+import { apiUrl, fetchDataset } from './services/apiClient';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { HeaderStats } from './components/HeaderStats';
@@ -233,29 +234,40 @@ export function App() {
   }, [extractedProjects, selectedYear, evidenceAllYears]);
 
   useEffect(() => {
-    // Load precomputed cross-year lineages (supports both { lineages } wrapper and raw array)
-    fetch(`/datasets/recurring_lineages.json?t=${Date.now()}`, { cache: 'no-store' })
-      .then((res) => res.json())
+    fetch(apiUrl('/api/v1/forensics/lineages?limit=100'), { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
       .then((data: any) => setRecurringLineages(Array.isArray(data) ? data : (data?.lineages || [])))
       .catch((err) => console.error('Failed to load recurring lineages:', err));
   }, [lastSyncedAt]);
 
   useEffect(() => {
-    const cacheBust = lastSyncedAt ? `?t=${encodeURIComponent(lastSyncedAt)}` : '';
-    fetch(`/datasets/${selectedYear}/statistics.json${cacheBust}`, { cache: 'no-store' })
-      .then((res) => res.json())
+    const force = Boolean(lastSyncedAt);
+    fetchDataset<any>(`${selectedYear}/statistics`, force)
       .then((data) => {
+        if (!data) return;
         setDatasetStats({
           totalProjects: data.totalCapitalProjects || data.totalProjects || 0,
-          totalAmount: data.officialTotalBudget || data.totalCapitalAmount || data.totalAmount || 0
+          totalAmount: data.officialTotalBudget || data.totalCapitalAmount || data.totalAmount || 0,
         });
       })
       .catch((err) => console.error(`Failed to load ${selectedYear} stats:`, err));
 
-    fetch(`/datasets/${selectedYear}/projects.min.json${cacheBust}`, { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => {
-        setExtractedProjects(Array.isArray(data) ? data : []);
+    Promise.all([
+      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&limit=150`), { cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&flagged_only=1&limit=100`), { cache: 'no-store' })
+        .then((res) => (res.ok ? res.json() : null))
+        .catch(() => null),
+    ])
+      .then(([topRes, flaggedRes]) => {
+        const mergedMap = new Map<string, any>();
+        for (const item of [...(topRes?.items || []), ...(flaggedRes?.items || [])]) {
+          if (item?.id && !mergedMap.has(item.id)) {
+            mergedMap.set(item.id, item);
+          }
+        }
+        setExtractedProjects(Array.from(mergedMap.values()));
         setExtractedProjectsYear(selectedYear);
       })
       .catch((err) => {
@@ -264,9 +276,8 @@ export function App() {
       });
 
     const priorYear = selectedYear - 1;
-    fetch(`/datasets/${priorYear}/statistics.json${cacheBust}`, { cache: 'no-store' })
-      .then((res) => res.json())
-      .then((data) => setPriorAmount(data.officialTotalBudget || data.totalCapitalAmount || data.totalAmount))
+    fetchDataset<any>(`${priorYear}/statistics`, force)
+      .then((data) => setPriorAmount(data?.officialTotalBudget || data?.totalCapitalAmount || data?.totalAmount))
       .catch(() => setPriorAmount(undefined));
   }, [selectedYear, lastSyncedAt]);
 
@@ -317,8 +328,18 @@ export function App() {
 
     if (matched) {
       setSelectedModalProject(matched);
+      setPendingDeepLink(null);
+      return;
     }
-    setPendingDeepLink(null);
+
+    fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&q=${encodeURIComponent(item)}&limit=10`))
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        const hit = d?.items?.[0];
+        if (hit) setSelectedModalProject(hit);
+      })
+      .catch(() => {})
+      .finally(() => setPendingDeepLink(null));
   }, [pendingDeepLink, extractedProjects, extractedProjectsYear, selectedYear]);
 
   // Bidirectional URL Permalink Synchronization

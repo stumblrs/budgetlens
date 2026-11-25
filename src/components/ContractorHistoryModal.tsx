@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl } from '../services/apiClient';
 import { Building2, Download, FileCheck2, FileText, Search, X } from 'lucide-react';
 import { ExpandableText } from './ExpandableText';
 import {
@@ -154,35 +155,11 @@ export const ContractorHistoryModal: React.FC<ContractorHistoryModalProps> = ({
     setLoading(true);
     const ctrl = new AbortController();
 
-    fetch(`/datasets/contractor_history/${bucket}.json`, { signal: ctrl.signal })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((shard: HistoryShardMap | null) => {
-        if (shard) {
-          historyShardCache.set(bucket, shard);
-          const entry = shard[contractor.contractorName];
-          if (entry) {
-            const contracts = entry.contracts || [];
-            const payments = entry.payments || [];
-            setHistoryData({
-              available: true,
-              contractorName: contractor.contractorName,
-              totalContracts: contracts.length || contractor.contractCount,
-              totalContractedNaira: contractor.totalContractedNaira,
-              totalNocopoDisbursedNaira: contractor.nocopoDisbursedNaira || 0,
-              contracts,
-              totalGovspendCount: contractor.govspendPaymentCount || payments.length,
-              totalGovspendNaira: contractor.govspendPaidNaira || 0,
-              payments,
-            });
-            setLoading(false);
-            return null;
-          }
-        }
-        return fetch(
-          `/api/procurement/contractor-history?name=${encodeURIComponent(contractor.contractorName)}&limit=200`,
-          { signal: ctrl.signal }
-        ).then((r) => (r.ok ? r.json() : null));
-      })
+    fetch(
+      apiUrl(`/api/v1/procurement/contractor-history?name=${encodeURIComponent(contractor.contractorName)}&limit=200`),
+      { signal: ctrl.signal }
+    )
+      .then((r) => (r.ok ? r.json() : null))
       .then((apiData) => {
         if (apiData && apiData.available) {
           setHistoryData(apiData);

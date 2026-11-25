@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { apiUrl } from '../services/apiClient';
 import {
   ArrowUp,
   Download,
@@ -75,10 +76,6 @@ interface Props {
   projects?: Project[];
   onSelectProject?: (project: Project) => void;
 }
-
-const AI_API_BASE = (
-  ((import.meta as unknown as { env?: Record<string, string> }).env?.VITE_API_BASE_URL || '')
-).replace(/\/$/, '');
 
 const FOLDERS_STORAGE_KEY = 'budgetlens_ai_folders_v2';
 const THREADS_STORAGE_KEY = 'budgetlens_ai_threads_v1';
@@ -590,10 +587,8 @@ export const GroundedAiAssistantWidget: React.FC<Props> = ({ onSelectProject }) 
     if (!textToSend) setInput('');
     setLoading(true);
 
-    const activeBundle = bundle || (await loadSupplementalAiDatasets());
-
     try {
-      const endpoint = `${AI_API_BASE}/api/ai/query`;
+      const endpoint = apiUrl('/api/ai/query');
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -632,6 +627,7 @@ export const GroundedAiAssistantWidget: React.FC<Props> = ({ onSelectProject }) 
       // Fallback to local multi-dataset search
     }
 
+    const activeBundle = bundle || (await loadSupplementalAiDatasets());
     const fallback = buildLocalFallbackResponse(queryText, detectedMode, activeBundle);
     appendMessageToThread(targetThreadId, {
       id: `a-${Date.now()}`,

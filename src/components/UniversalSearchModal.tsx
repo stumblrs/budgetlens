@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { apiUrl, fetchDataset } from '../services/apiClient';
 import { Search, X, CornerDownLeft, Sparkles, FileText, Zap, Hash, MapPin, Bot, Filter } from 'lucide-react';
 import { useBudgetDatabase } from '../context/BudgetDatabaseContext';
 import { ExpandableText } from './ExpandableText';
@@ -70,8 +71,7 @@ const SECTOR_COLORS: Record<string, string> = {
 let staticFallbackPromise: Promise<Project[]> | null = null;
 function loadStaticSearchFallback(): Promise<Project[]> {
   if (!staticFallbackPromise) {
-    staticFallbackPromise = fetch('/datasets/search_index_top.json', { cache: 'no-cache' })
-      .then((res) => (res.ok ? res.json() : null))
+    staticFallbackPromise = fetchDataset<{ records?: Project[] }>('search_index_top')
       .then((data) => (Array.isArray(data?.records) ? data.records : []))
       .catch(() => []);
   }
@@ -147,7 +147,7 @@ export const UniversalSearchModal: React.FC<Props> = ({
         if (filterSeverity !== 'ALL') params.set('severity', filterSeverity);
 
         try {
-          const res = await fetch(`/api/search?${params.toString()}`);
+          const res = await fetch(apiUrl(`/api/search?${params.toString()}`));
           if (res.ok) {
             const data = await res.json();
             if (data?.available && Array.isArray(data.results)) {

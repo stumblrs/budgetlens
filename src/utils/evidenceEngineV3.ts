@@ -6,6 +6,7 @@
  * and builds the compact `CrossLedgerRuleContext` passed to Rule Engine v3.0 and the Web Worker.
  */
 
+import { fetchDataset } from '../services/apiClient';
 import { normalizeMdaCoreClient } from './projectLifecycle';
 
 export interface CompactMdaRiskProfile {
@@ -136,9 +137,9 @@ export function resetEvidenceEngineV3Cache(): void {
 
 export function loadEvidenceEngineAllYears(): Promise<EvidenceEngineAllYearsPayload | null> {
   if (!cachedAllYearsPromise) {
-    cachedAllYearsPromise = fetch('/datasets/evidence_engine_all_years.json', { cache: 'no-cache' })
-      .then((res) => (res.ok ? (res.json() as Promise<EvidenceEngineAllYearsPayload>) : null))
-      .catch(() => null);
+    cachedAllYearsPromise = fetchDataset<EvidenceEngineAllYearsPayload>(
+      'evidence_engine_all_years'
+    ).catch(() => null);
   }
   return cachedAllYearsPromise;
 }

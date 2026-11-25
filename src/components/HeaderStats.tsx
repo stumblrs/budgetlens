@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import { Building2, Coins, Flag, FolderKanban } from 'lucide-react';
 import { useBudgetDatabase } from '../context/BudgetDatabaseContext';
 import { getPresidentForYear } from '../data/presidentialTerms';
@@ -53,7 +54,7 @@ export const HeaderStats: React.FC<HeaderStatsProps> = ({
 
   useEffect(() => {
     let active = true;
-    fetch(`/datasets/narratives/${effectiveYear}.json`, { cache: 'no-store' })
+    fetch(datasetUrl(`/datasets/narratives/${effectiveYear}.json`), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: YearNarrativeDossier | null) => {
         if (active) setNarrative(data);
@@ -61,7 +62,7 @@ export const HeaderStats: React.FC<HeaderStatsProps> = ({
       .catch(() => {
         if (active) setNarrative(null);
       });
-    fetch('/datasets/debt_profile.json', { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: { yearlyDebt?: Array<{ financialYear: number; totalDebtNairaM?: number | null; totalDebtUsdM?: number | null }> } | null) => {
         if (!active || !data?.yearlyDebt) return;
@@ -234,17 +235,17 @@ export const HeaderStats: React.FC<HeaderStatsProps> = ({
             {(coverageMeta.tier !== 'FULL_SCHEDULE' ||
               coverageMeta.partialLedgerNotes.length > 0 ||
               Boolean(mergedCoverage.over_100_pct_flag)) && (
-              <div
-                style={{
-                  fontSize: '0.72rem',
-                  lineHeight: 1.4,
-                  color: coverageMeta.tier === 'FULL_SCHEDULE' ? 'var(--text-muted)' : coverageMeta.color,
-                  marginTop: '0.12rem',
-                }}
-              >
-                {coverageMeta.detail}
-              </div>
-            )}
+                <div
+                  style={{
+                    fontSize: '0.72rem',
+                    lineHeight: 1.4,
+                    color: coverageMeta.tier === 'FULL_SCHEDULE' ? 'var(--text-muted)' : coverageMeta.color,
+                    marginTop: '0.12rem',
+                  }}
+                >
+                  {coverageMeta.detail}
+                </div>
+              )}
           </div>
         </div>
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl } from '../services/apiClient';
 import {
   ArrowLeft,
   Check,
@@ -87,22 +88,36 @@ export const BudgetRecordDossierPage: React.FC<BudgetRecordDossierPageProps> = (
           page: targetPage,
         });
         if (!found && targetItem) {
-          return fetch(`/datasets/${targetYear}/projects.min.json`, { cache: 'no-cache' })
-            .then((res) => (res.ok ? res.json() : []))
-            .then((minList: any[]) => {
-              if (!active || !Array.isArray(minList)) return;
-              const norm = targetItem.trim().toLowerCase();
-              const matchedMin =
-                (targetPage
-                  ? minList.find(
-                      (p) =>
-                        String(p.projectCode || '').trim().toLowerCase() === norm &&
-                        Number(p.page) === Number(targetPage)
-                    )
-                  : undefined) ||
-                minList.find((p) => String(p.id || '').trim().toLowerCase() === norm) ||
-                minList.find((p) => String(p.projectCode || '').trim().toLowerCase() === norm);
-              if (matchedMin) setMinFallbackProject(matchedMin);
+          return fetch(apiUrl(`/api/v1/projects/${encodeURIComponent(targetItem.trim())}`), { cache: 'no-cache' })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((singlePayload: { item?: any } | null) => {
+              if (!active) return;
+              if (singlePayload?.item) {
+                setMinFallbackProject(singlePayload.item);
+                return;
+              }
+              return fetch(
+                apiUrl(`/api/v1/projects?year=${targetYear}&q=${encodeURIComponent(targetItem.trim())}&limit=20`),
+                { cache: 'no-cache' }
+              )
+                .then((res) => (res.ok ? res.json() : null))
+                .then((listRes: { items?: any[] } | null) => {
+                  if (!active || !Array.isArray(listRes?.items)) return;
+                  const norm = targetItem.trim().toLowerCase();
+                  const minList = listRes.items;
+                  const matchedMin =
+                    (targetPage
+                      ? minList.find(
+                          (p) =>
+                            String(p.projectCode || '').trim().toLowerCase() === norm &&
+                            Number(p.page) === Number(targetPage)
+                        )
+                      : undefined) ||
+                    minList.find((p) => String(p.id || '').trim().toLowerCase() === norm) ||
+                    minList.find((p) => String(p.projectCode || '').trim().toLowerCase() === norm) ||
+                    minList[0];
+                  if (matchedMin) setMinFallbackProject(matchedMin);
+                });
             });
         }
       })

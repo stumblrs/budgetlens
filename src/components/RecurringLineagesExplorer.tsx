@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiUrl, datasetUrl } from '../services/apiClient';
 import { Search, ExternalLink, Calendar, TrendingUp, AlertTriangle, ShieldCheck, Building2, Download, FileSpreadsheet } from 'lucide-react';
 import { useBudgetDatabase } from '../context/BudgetDatabaseContext';
 import { buildCanonicalPermalink } from '../utils/urlState';
@@ -201,7 +202,7 @@ export const RecurringLineagesExplorer: React.FC<Props> = ({ lineages: propLinea
       setSelectedLineage(normalized[0] || null);
       return;
     }
-    fetch(`/datasets/recurring_lineages.json?t=${Date.now()}`, { cache: 'no-store' })
+    fetch(apiUrl('/api/v1/forensics/lineages?limit=200'), { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         const normalized = normalizeLineages(data);
@@ -214,7 +215,7 @@ export const RecurringLineagesExplorer: React.FC<Props> = ({ lineages: propLinea
   useEffect(() => {
     let active = true;
     Promise.all([
-      fetch('/datasets/follow_the_money_links.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/follow_the_money_links.json'), { cache: 'no-cache' })
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
       loadOaugfAuditIndex(),

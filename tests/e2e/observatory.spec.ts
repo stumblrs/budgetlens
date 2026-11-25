@@ -103,7 +103,7 @@ test.describe('BudgetLens Civic Fiscal Observatory E2E Smoke Suite', () => {
       await expect(searchBtn).toBeVisible();
       await searchBtn.click();
       const searchDialog = page.getByRole('dialog', { name: 'Universal Budget Search' });
-      await expect(searchDialog).toBeVisible();
+      await expect(searchDialog).toBeVisible({ timeout: 15_000 });
       await page.getByRole('button', { name: 'Close search' }).click();
       await expect(searchDialog).toBeHidden();
 

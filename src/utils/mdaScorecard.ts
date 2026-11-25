@@ -1,3 +1,5 @@
+import { fetchDataset } from '../services/apiClient';
+
 export type MdaPillarKey =
   | 'paddingRestraint'
   | 'birCapitalExecution'
@@ -486,27 +488,27 @@ let cachedOaugfPromise: Promise<OaugfAuditIndexPayload | null> | null = null;
 
 export function loadMdaIntegrityScorecards(): Promise<MdaIntegrityScorecardsPayload | null> {
   if (!cachedScorecardsPromise) {
-    cachedScorecardsPromise = fetch('/datasets/mda_integrity_scorecards.json')
-      .then((res) => (res.ok ? (res.json() as Promise<MdaIntegrityScorecardsPayload>) : null))
-      .catch(() => null);
+    cachedScorecardsPromise = fetchDataset<MdaIntegrityScorecardsPayload>(
+      'mda_integrity_scorecards'
+    ).catch(() => null);
   }
   return cachedScorecardsPromise;
 }
 
 export function loadMacroCredibilityTracker(): Promise<MacroCredibilityTrackerPayload | null> {
   if (!cachedMacroPromise) {
-    cachedMacroPromise = fetch('/datasets/macro_credibility_tracker.json')
-      .then((res) => (res.ok ? (res.json() as Promise<MacroCredibilityTrackerPayload>) : null))
-      .catch(() => null);
+    cachedMacroPromise = fetchDataset<MacroCredibilityTrackerPayload>(
+      'macro_credibility_tracker'
+    ).catch(() => null);
   }
   return cachedMacroPromise;
 }
 
 export function loadOaugfAuditIndex(): Promise<OaugfAuditIndexPayload | null> {
   if (!cachedOaugfPromise) {
-    cachedOaugfPromise = fetch('/datasets/oaugf_audit_index.json')
-      .then((res) => (res.ok ? (res.json() as Promise<OaugfAuditIndexPayload>) : null))
-      .catch(() => null);
+    cachedOaugfPromise = fetchDataset<OaugfAuditIndexPayload>(
+      'oaugf_audit_index'
+    ).catch(() => null);
   }
   return cachedOaugfPromise;
 }
@@ -585,11 +587,7 @@ let cachedConvergencePromise: Promise<RedFlagConvergencePayload | null> | null =
 
 export function loadRedFlagConvergenceIndex(): Promise<RedFlagConvergencePayload | null> {
   if (!cachedConvergencePromise) {
-    cachedConvergencePromise = fetch('/datasets/red_flag_convergence_index.json', {
-      cache: 'no-cache',
-    })
-      .then((res) => (res.ok ? (res.json() as Promise<RedFlagConvergencePayload>) : null))
-      .catch(() => null);
+    cachedConvergencePromise = fetchDataset<RedFlagConvergencePayload>('red_flag_convergence_index').catch(() => null);
   }
   return cachedConvergencePromise;
 }

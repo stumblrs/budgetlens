@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   BookmarkPlus,
@@ -146,7 +147,7 @@ export const BudgetAuditCalculatorWidget: React.FC<Props> = ({ financialYear }) 
     let active = true;
     const yearsToLoad = [financialYear, financialYear - 1].filter((y) => y >= 1999);
     yearsToLoad.forEach((year) => {
-      fetch(`/datasets/${year}/statistics.json`, { cache: 'no-store' })
+      fetch(datasetUrl(`/datasets/${year}/statistics.json`), { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .then((stats) => {
           if (!active || !stats) return;

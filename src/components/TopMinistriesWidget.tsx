@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { apiUrl, fetchDataset } from '../services/apiClient';
 import { Search, Building2, Download, FileText, Copy, Check, X, ShieldCheck, Layers } from 'lucide-react';
 import { useBudgetDatabase } from '../context/BudgetDatabaseContext';
 import { getPresidentForYear } from '../data/presidentialTerms';
@@ -71,8 +72,7 @@ export const TopMinistriesWidget: React.FC<Props> = ({ financialYear }) => {
     if (topMdas && topMdas.length > 0) {
       setMinistries(topMdas);
     } else {
-      fetch(`/datasets/${financialYear}/statistics.json`)
-        .then(res => res.json())
+      fetchDataset<any>(`${financialYear}/statistics`)
         .then(stats => {
           if (stats?.topMinistries) {
             const rawTop = stats.topMinistries as RawMinistry[];
@@ -106,25 +106,18 @@ export const TopMinistriesWidget: React.FC<Props> = ({ financialYear }) => {
     setSelectedMDA(mda);
     setLoadingProjects(true);
 
-    fetch(`/datasets/${financialYear}/projects.min.json`)
-      .then(res => res.json())
-      .then((allProjects: any[]) => {
-        const mdaWords = mda.name.toLowerCase().split(/\s+/).filter(w => w.length > 3 && !['federal', 'ministry', 'department', 'agency'].includes(w));
-
-        const matched = allProjects.filter(p => {
-          const name = (p.projectName || '').toLowerCase();
-          const sector = (p.sector || '').toLowerCase();
-          return mdaWords.some(w => name.includes(w) || sector.includes(w));
-        });
-
-        matched.sort((a, b) => (b.amount || 0) - (a.amount || 0));
-
-        setMdaProjects(matched.slice(0, 4).map(p => ({
-          projectCode: p.projectCode || p.id || 'ERGP',
-          projectName: p.projectName,
-          amount: p.amount || 0,
-          page: p.page || 1
-        })));
+    fetch(apiUrl(`/api/v1/projects?year=${financialYear}&mda=${encodeURIComponent(mda.name)}&limit=6`))
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { items?: any[] } | null) => {
+        const items = data?.items || [];
+        setMdaProjects(
+          items.slice(0, 4).map((p) => ({
+            projectCode: p.projectCode || p.id || 'ERGP',
+            projectName: p.projectName,
+            amount: p.amount || 0,
+            page: p.page || 1,
+          }))
+        );
         setLoadingProjects(false);
       })
       .catch(() => setLoadingProjects(false));

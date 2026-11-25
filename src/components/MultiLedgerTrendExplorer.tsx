@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   Bar,
   CartesianGrid,
@@ -76,12 +77,12 @@ export const MultiLedgerTrendExplorer: React.FC<MultiLedgerTrendExplorerProps> =
     let active = true;
     setLoading(true);
     Promise.all([
-      fetch('/datasets/debt_profile.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
       loadMacroCredibilityTracker().catch(() => null),
       loadEvidenceEngineAllYears().catch(() => null),
-      fetch('/datasets/oaugf_audit_index.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/oaugf_audit_index.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
     ])

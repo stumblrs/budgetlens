@@ -24,9 +24,9 @@ export default defineConfig({
   webServer: process.env.PLAYWRIGHT_SKIP_WEBSERVER
     ? undefined
     : {
-        command: 'npm run preview -- --port 4173 --host 127.0.0.1',
+        command: 'node scripts/preview_local_worker.mjs',
         url: BASE_URL,
         reuseExistingServer: !process.env.CI,
-        timeout: 60_000,
+        timeout: 90_000,
       },
 });

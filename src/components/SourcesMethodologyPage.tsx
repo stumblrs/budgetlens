@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   BookOpen,
@@ -320,20 +321,20 @@ export const SourcesMethodologyPage: React.FC<SourcesMethodologyPageProps> = ({
 
     Promise.all([
       loadSourceProvenance(),
-      fetch('/datasets/forensic_sweep_1999_2026.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/forensic_sweep_1999_2026.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch('/datasets/debt_profile.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch('/datasets/policy_benchmarks.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/policy_benchmarks.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
-      fetch('/datasets/execution_tracker.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/execution_tracker.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
       loadOaugfAuditIndex(),
-      fetch('/datasets/red_flag_convergence_index.json', { cache: 'no-cache' })
+      fetch(datasetUrl('/datasets/red_flag_convergence_index.json'), { cache: 'no-cache' })
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
       loadEvidenceEngineAllYears(),
@@ -577,7 +578,7 @@ export const SourcesMethodologyPage: React.FC<SourcesMethodologyPageProps> = ({
       },
     ],
     permalink: buildCanonicalPermalink({ tab: 'methodology' }),
-    footnote: 'SHA-256 digests verified verbatim against ingested PDF and JSONL files in BudgetLens source_provenance.json.',
+    footnote: 'SHA-256 digests verified verbatim against ingested official appropriation PDFs and treasury records.',
   });
 
   const buildCompleteMethodologySpec = (): TabularDossierSpec => ({
@@ -1558,10 +1559,10 @@ export const SourcesMethodologyPage: React.FC<SourcesMethodologyPageProps> = ({
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
               <div>
                 <h3 className="font-editorial" style={{ fontSize: '1.08rem', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>
-                  Verified Cross-Ledger Static Intelligence Datasets (<code>public/datasets/</code>)
+                  Verified Cross-Ledger Forensic Indices
                 </h3>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: '0.15rem 0 0' }}>
-                  Precomputed static JSON artifacts served offline with zero backend runtime dependency, fingerprinted in <code>source_provenance.json</code>.
+                  Precomputed fiscal cross-checks served from verified official audit, procurement, and treasury ledgers.
                 </p>
               </div>
               <span className="editorial-pill" style={{ backgroundColor: 'var(--emerald-bg)', color: '#047857', border: '1px solid #a7f3d0' }}>

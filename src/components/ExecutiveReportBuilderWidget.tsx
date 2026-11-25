@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { apiUrl, datasetUrl } from '../services/apiClient';
 import {
   FileText,
   Printer,
@@ -180,11 +181,11 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
     let active = true;
     setSixLedgerLoading(true);
     Promise.all([
-      fetch('/datasets/oaugf_audit_index.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch('/datasets/bill_act_diffs/index.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch('/datasets/govspend_forensics.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch('/datasets/vendor_network_index.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch('/datasets/red_flag_convergence_index.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(datasetUrl('/datasets/oaugf_audit_index.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(datasetUrl('/datasets/bill_act_diffs/index.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(datasetUrl('/datasets/govspend_forensics.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(datasetUrl('/datasets/vendor_network_index.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch(datasetUrl('/datasets/red_flag_convergence_index.json'), { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
     ])
       .then(([oaugf, billDiff, govspend, vendorNetwork, convergence]) => {
         if (!active) return;
@@ -205,7 +206,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
   useEffect(() => {
     let active = true;
 
-    fetch(`/datasets/${financialYear}/statistics.json`, { cache: 'no-store' })
+    fetch(datasetUrl(`/datasets/${financialYear}/statistics.json`), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (active) setYearStats(data);
@@ -215,7 +216,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
       });
 
     if (financialYear > 1999) {
-      fetch(`/datasets/${financialYear - 1}/statistics.json`, { cache: 'no-store' })
+      fetch(datasetUrl(`/datasets/${financialYear - 1}/statistics.json`), { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (active) setPriorYearStats(data);
@@ -227,7 +228,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
       setPriorYearStats(null);
     }
 
-    fetch(`/datasets/narratives/${financialYear}.json`, { cache: 'no-store' })
+    fetch(datasetUrl(`/datasets/narratives/${financialYear}.json`), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (active) setNarrativeData(data);
@@ -251,7 +252,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
     if (cachedDebtRows) {
       setDebtSnapshot(resolveDebtForYear(cachedDebtRows));
     } else {
-      fetch('/datasets/debt_profile.json', { cache: 'no-store' })
+      fetch(datasetUrl('/datasets/debt_profile.json'), { cache: 'no-store' })
         .then((res) => (res.ok ? res.json() : null))
         .then((data) => {
           if (!active || !data?.yearlyDebt) return;
@@ -268,7 +269,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
     };
   }, [financialYear]);
 
-  // Lazy-load /datasets/recurring_lineages.json when Recurring Lineage template is selected
+  // Lazy-load multi-year recurring lineages when Recurring Lineage template is selected
   useEffect(() => {
     if (template !== 'recurring_lineage') return;
     if (cachedLineages && cachedLineages.length > 0) {
@@ -280,7 +281,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
     setLineagesLoading(true);
     setLineagesError(null);
 
-    fetch('/datasets/recurring_lineages.json', { cache: 'no-store' })
+    fetch(apiUrl('/api/v1/forensics/lineages?limit=200'), { cache: 'no-store' })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -294,7 +295,7 @@ export const ExecutiveReportBuilderWidget: React.FC<Props> = ({
       })
       .catch(() => {
         if (!active) return;
-        setLineagesError('Unable to load multi-year recurring_lineages.json dataset.');
+        setLineagesError('Unable to load multi-year recurring lineage dataset.');
         setLineagesLoading(false);
       });
 

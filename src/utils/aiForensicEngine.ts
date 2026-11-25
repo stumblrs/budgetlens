@@ -15,6 +15,7 @@ import {
   lookupConstituency,
 } from '../data/constituenciesDirectory';
 import type { PrecomputedStatisticalForensics } from './statisticalForensics';
+import { fetchDataset } from '../services/apiClient';
 
 export type AiInvestigationMode =
   | 'all'
@@ -534,15 +535,7 @@ export function resetSupplementalAiDatasetsCache(): void {
 
 export async function loadSupplementalAiDatasets(): Promise<SupplementalDatasetsBundle> {
   if (cachedBundle) return cachedBundle;
-  const fetchJson = async (url: string) => {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
+  const fetchJson = (url: string) => fetchDataset<any>(url).catch(() => null);
   const [
     paddingIndex,
     executionTracker,
@@ -820,11 +813,11 @@ export function findDuplicateClustersForQuery(
   const filtered =
     topicTokens.length > 0
       ? combined.filter((cl) => {
-          const hay = `${cl.canonicalTitle} ${cl.agencies.join(' ')} ${cl.items
-            .map((i) => `${i.title} ${i.sector || ''} ${i.state || ''}`)
-            .join(' ')}`.toLowerCase();
-          return topicTokens.some((tok) => hay.includes(tok));
-        })
+        const hay = `${cl.canonicalTitle} ${cl.agencies.join(' ')} ${cl.items
+          .map((i) => `${i.title} ${i.sector || ''} ${i.state || ''}`)
+          .join(' ')}`.toLowerCase();
+        return topicTokens.some((tok) => hay.includes(tok));
+      })
       : combined;
 
   // Deduplicate by normalized title + count
@@ -850,25 +843,25 @@ export function findSimilarItemsForQuery(
   const code = extractCodeFromQuery(query);
   const anchorRec = code
     ? records.find(
-        (r) =>
-          r.recordIdentity.projectCode?.toUpperCase() === code.toUpperCase() ||
-          r.recordIdentity.id.toUpperCase() === code.toUpperCase()
-      )
+      (r) =>
+        r.recordIdentity.projectCode?.toUpperCase() === code.toUpperCase() ||
+        r.recordIdentity.id.toUpperCase() === code.toUpperCase()
+    )
     : undefined;
 
   const anchorStatic =
     !anchorRec && code
       ? staticSearchRecords.find(
-          (s) =>
-            s.projectCode?.toUpperCase() === code.toUpperCase() ||
-            s.id.toUpperCase() === code.toUpperCase()
-        )
+        (s) =>
+          s.projectCode?.toUpperCase() === code.toUpperCase() ||
+          s.id.toUpperCase() === code.toUpperCase()
+      )
       : undefined;
 
   const anchorCitation: AiCitationItem | null = anchorRec
     ? recordToCitation(anchorRec)
     : anchorStatic
-    ? {
+      ? {
         id: anchorStatic.id,
         code: anchorStatic.projectCode || 'ERGP',
         title: anchorStatic.projectName,
@@ -880,7 +873,7 @@ export function findSimilarItemsForQuery(
         sector: anchorStatic.sector,
         state: anchorStatic.state,
       }
-    : null;
+      : null;
 
   const anchorTitle = anchorCitation?.title || query;
   const anchorTokens = new Set(extractTopicTokens(anchorTitle));

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import { BookOpen, ChevronDown, ChevronUp, FileText, Quote } from 'lucide-react';
 
 interface MacroFramework {
@@ -55,7 +56,7 @@ export const MacroNarrativeBrief: React.FC<MacroNarrativeBriefProps> = ({ financ
     let active = true;
     setLoading(true);
 
-    fetch(`/datasets/narratives/${financialYear}.json`, { cache: 'no-store' })
+    fetch(datasetUrl(`/datasets/narratives/${financialYear}.json`), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data: YearNarrativeDossier | null) => {
         if (!active) return;

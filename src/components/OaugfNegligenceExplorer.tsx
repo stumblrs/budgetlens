@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { apiUrl, fetchDataset } from '../services/apiClient';
 import {
   Building2,
   Download,
@@ -79,8 +80,7 @@ export const OaugfNegligenceExplorer: React.FC = () => {
 
   useEffect(() => {
     let active = true;
-    fetch('/datasets/red_flag_convergence_index.json')
-      .then((r) => (r.ok ? r.json() : null))
+    fetchDataset<any>('red_flag_convergence_index')
       .then((c) => {
         if (active && c) setConvergence(c);
       })
@@ -90,22 +90,14 @@ export const OaugfNegligenceExplorer: React.FC = () => {
         if (!active) return;
         setPayload(data);
         setLoading(false);
-        if (data?.shardFiles?.length) {
-          Promise.all(
-            data.shardFiles.map((s) =>
-              fetch(`/datasets/${s.path}`)
-                .then((r) => (r.ok ? r.json() : null))
-                .catch(() => null)
-            )
-          ).then((shards) => {
-            if (!active) return;
-            const merged: OaugfAuditFindingSample[] = [];
-            for (const sh of shards) {
-              if (Array.isArray(sh?.issues)) merged.push(...sh.issues);
+        fetch(apiUrl('/api/v1/forensics/oaugf?limit=200'))
+          .then((r) => (r.ok ? r.json() : null))
+          .then((apiRes) => {
+            if (active && Array.isArray(apiRes?.findings) && apiRes.findings.length > 0) {
+              setShardedIssues(apiRes.findings);
             }
-            if (merged.length > 0) setShardedIssues(merged);
-          });
-        }
+          })
+          .catch(() => {});
       })
       .catch(() => {
         if (active) setLoading(false);

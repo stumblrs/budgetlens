@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { apiUrl } from '../services/apiClient';
 import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search, X } from 'lucide-react';
 import { readAppUrlState, syncUrlParams } from '../utils/urlState';
 import { ExpandableText } from './ExpandableText';
@@ -45,14 +46,24 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
     setLoading(true);
     setError(null);
     let active = true;
-    fetch(`/datasets/${docYear}/projects.min.json`, { cache: 'no-cache' })
+    const params = new URLSearchParams({
+      year: String(docYear),
+      sort: 'page_asc',
+      limit: '200',
+    });
+    if (viewMode === 'page' && activePage > 0) {
+      params.set('page', String(activePage));
+    } else if (searchQuery.trim()) {
+      params.set('q', searchQuery.trim());
+    }
+    fetch(apiUrl(`/api/v1/projects?${params.toString()}`), { cache: 'no-cache' })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
       })
       .then((data) => {
         if (!active) return;
-        const list = Array.isArray(data) ? data : (data?.projects || data?.records || []);
+        const list = Array.isArray(data) ? data : (data?.items || data?.projects || data?.records || []);
         setRows(list);
         setLoading(false);
       })
@@ -65,7 +76,7 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
     return () => {
       active = false;
     };
-  }, [docYear]);
+  }, [docYear, activePage, viewMode, searchQuery]);
 
   useEffect(() => {
     if (!loading && highlightedRef.current) {

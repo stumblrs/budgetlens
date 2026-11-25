@@ -1,4 +1,5 @@
 import { getMacroForYear } from '../data/historicalMacroData';
+import { fetchDataset } from '../services/apiClient';
 import { getPresidentForYear } from '../data/presidentialTerms';
 import type { RegistryDocument } from '../services/budgetDatabaseEngine';
 
@@ -271,15 +272,10 @@ let provenanceCachePromise: Promise<ProvenanceManifestResponse | null> | null = 
 export async function loadSourceProvenance(): Promise<ProvenanceManifestResponse | null> {
   if (typeof fetch === 'undefined') return null;
   if (!provenanceCachePromise) {
-    provenanceCachePromise = fetch('/datasets/source_provenance.json', { cache: 'no-cache' })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<ProvenanceManifestResponse>;
-      })
-      .catch(() => {
-        provenanceCachePromise = null;
-        return null;
-      });
+    provenanceCachePromise = fetchDataset<ProvenanceManifestResponse>('source_provenance').catch(() => {
+      provenanceCachePromise = null;
+      return null;
+    });
   }
   return provenanceCachePromise;
 }

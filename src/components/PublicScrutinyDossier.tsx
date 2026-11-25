@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { datasetUrl } from '../services/apiClient';
 import {
   AlertTriangle,
   Building2,
@@ -543,7 +544,7 @@ export const PublicScrutinyDossier: React.FC<PublicScrutinyDossierProps> = ({ on
   useEffect(() => {
     let active = true;
     setLoading(true);
-    fetch('/datasets/forensic_sweep_1999_2026.json', { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/forensic_sweep_1999_2026.json'), { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((json: ForensicSweepPayload | null) => {
         if (!active) return;
