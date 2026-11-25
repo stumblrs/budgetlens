@@ -40,8 +40,34 @@ app.onError((err, c) => {
   );
 });
 
-app.get('/api/v1/health', (c) => {
-  return c.json({
+async function countTableRows(db: D1Database | undefined, table: 'budget_records' | 'nocopo_contracts' | 'app_datasets'): Promise<number | null> {
+  if (!db) return null;
+  try {
+    const row = await db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).first<{ count: number }>();
+    return typeof row?.count === 'number' ? row.count : Number(row?.count ?? 0);
+  } catch {
+    return null;
+  }
+}
+
+app.get('/api/v1/health', async (c) => {
+  const deep = c.req.query('deep') === '1';
+  const payload: {
+    ok: boolean;
+    service: string;
+    runtime: string;
+    environment: string;
+    bindings: {
+      budgets: boolean;
+      ledgers: boolean;
+      app: boolean;
+    };
+    counts?: {
+      budget_records: number | null;
+      nocopo_contracts: number | null;
+      app_datasets: number | null;
+    };
+  } = {
     ok: true,
     service: 'budgetlens-api',
     runtime: 'cloudflare-workers',
@@ -51,7 +77,18 @@ app.get('/api/v1/health', (c) => {
       ledgers: Boolean(c.env?.DB_LEDGERS),
       app: Boolean(c.env?.DB_APP),
     },
-  });
+  };
+
+  if (deep) {
+    const [budget_records, nocopo_contracts, app_datasets] = await Promise.all([
+      countTableRows(c.env?.DB_BUDGETS, 'budget_records'),
+      countTableRows(c.env?.DB_LEDGERS, 'nocopo_contracts'),
+      countTableRows(c.env?.DB_APP, 'app_datasets'),
+    ]);
+    payload.counts = { budget_records, nocopo_contracts, app_datasets };
+  }
+
+  return c.json(payload);
 });
 
 const PENDING_ENDPOINTS = [
