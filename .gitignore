@@ -47,3 +47,4 @@ ingestion/oaugf_extracted/
 .wrangler/
 .cloudflare/
 worker-configuration.d.ts
+*.tsbuildinfo
