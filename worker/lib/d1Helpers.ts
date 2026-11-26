@@ -8,7 +8,7 @@ export interface WorkerEnv {
   IP_SALT?: string;
 }
 
-export const CACHE_PUBLIC_SHORT = 'public, max-age=300, stale-while-revalidate=3600';
+export const CACHE_PUBLIC_SHORT = 'public, max-age=300, s-maxage=3600, stale-while-revalidate=86400';
 
 const FTS_RESERVED = new Set(['AND', 'OR', 'NOT', 'NEAR']);
 const CORP_SUFFIX_RE =

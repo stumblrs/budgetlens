@@ -22,6 +22,64 @@ app.use(
   })
 );
 
+const UNCACHEABLE_API_PREFIXES = [
+  '/api/health',
+  '/api/v1/health',
+  '/api/tips',
+  '/api/v1/tips',
+  '/api/casebooks',
+  '/api/v1/casebooks',
+];
+
+app.use('/api/*', async (c, next) => {
+  if (c.req.method !== 'GET') {
+    await next();
+    return;
+  }
+  const path = c.req.path;
+  if (UNCACHEABLE_API_PREFIXES.some((prefix) => path.startsWith(prefix))) {
+    await next();
+    return;
+  }
+
+  const edgeCache =
+    typeof caches !== 'undefined'
+      ? (caches as unknown as { default?: Cache }).default
+      : undefined;
+  if (!edgeCache) {
+    await next();
+    return;
+  }
+
+  const cacheKey = new Request(c.req.url, { method: 'GET' });
+  const cached = await edgeCache.match(cacheKey);
+  if (cached) {
+    const hitHeaders = new Headers(cached.headers);
+    if (!hitHeaders.has('Access-Control-Allow-Origin')) {
+      hitHeaders.set('Access-Control-Allow-Origin', '*');
+    }
+    return new Response(cached.body, {
+      status: cached.status,
+      statusText: cached.statusText,
+      headers: hitHeaders,
+    });
+  }
+
+  await next();
+
+  if (
+    c.res.status === 200 &&
+    (c.res.headers.get('Cache-Control') || '').includes('public')
+  ) {
+    const toCache = c.res.clone();
+    try {
+      c.executionCtx.waitUntil(edgeCache.put(cacheKey, toCache));
+    } catch {
+      void edgeCache.put(cacheKey, toCache);
+    }
+  }
+});
+
 app.onError((err, c) => {
   console.error(
     JSON.stringify({

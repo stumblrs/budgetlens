@@ -196,21 +196,38 @@ projectsRouter.get('/projects', async (c) => {
     params.push(severity.toLowerCase());
   }
 
+  const yearOnlyFilter =
+    whereClauses.length === 1 &&
+    Boolean(yearRaw && yearRaw.toUpperCase() !== 'ALL') &&
+    !ftsExpr &&
+    !pageRaw &&
+    !codeRaw &&
+    !(mda && mda.toUpperCase() !== 'ALL') &&
+    !(sector && sector.toUpperCase() !== 'ALL') &&
+    !(state && state.toUpperCase() !== 'ALL') &&
+    !(zone && zone.toUpperCase() !== 'ALL') &&
+    !(spendingType && spendingType.toUpperCase() !== 'ALL') &&
+    !flaggedOnly &&
+    !(severity && severity.toUpperCase() !== 'ALL');
+
   const whereSql = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
   const joinSql = ftsExpr
     ? 'FROM budget_fts f JOIN budget_records r ON r.rowid = f.rowid'
     : 'FROM budget_records r';
 
+  const hasYearFilter = Boolean(yearRaw && yearRaw.toUpperCase() !== 'ALL');
   let orderSql = ftsExpr
     ? 'ORDER BY bm25(budget_fts, 4.0, 2.0, 3.0, 1.0, 1.0), r.amount_naira DESC'
-    : 'ORDER BY r.amount_naira DESC, r.financial_year DESC';
+    : hasYearFilter
+      ? 'ORDER BY r.amount_naira DESC'
+      : 'ORDER BY r.amount_naira DESC, r.financial_year DESC';
   if (sort === 'amount_asc') {
     orderSql = 'ORDER BY r.amount_naira ASC, r.rowid ASC';
   } else if (sort === 'page_asc') {
     orderSql = 'ORDER BY r.pdf_page ASC, r.amount_naira DESC';
   }
 
-  const rowsRes = await db
+  const rowsPromise = db
     .prepare(
       `
       SELECT
@@ -227,12 +244,54 @@ projectsRouter.get('/projects', async (c) => {
     .bind(...params, limit, offset)
     .all<BudgetRow>();
 
-  const aggRow = await db
-    .prepare(
-      `SELECT COUNT(*) AS cnt, COALESCE(SUM(r.amount_naira), 0) AS total_amt ${joinSql} ${whereSql}`
-    )
-    .bind(...params)
-    .first<{ cnt: number; total_amt: number }>();
+  let totalMatches: number | null = null;
+  let totalAmountNaira: number | null = null;
+
+  let rowsRes: D1Result<BudgetRow>;
+  if (yearOnlyFilter && yearRaw) {
+    const yrNum = Number.parseInt(yearRaw, 10);
+    const [rRes, statRow] = await Promise.all([
+      rowsPromise,
+      db
+        .prepare('SELECT payload_json FROM year_statistics WHERE financial_year = ?')
+        .bind(yrNum)
+        .first<{ payload_json: string }>(),
+    ]);
+    rowsRes = rRes;
+    if (statRow?.payload_json) {
+      const stats = safeJsonParse<Record<string, unknown>>(statRow.payload_json, {});
+      const statCnt = stats.totalCapitalProjects ?? stats.totalProjects;
+      const statAmt = stats.totalCapitalAmount ?? stats.totalAmount ?? stats.officialTotalBudget;
+      if (typeof statCnt === 'number' && Number.isFinite(statCnt)) {
+        totalMatches = statCnt;
+        totalAmountNaira =
+          typeof statAmt === 'number' && Number.isFinite(statAmt) ? statAmt : 0;
+      }
+    }
+    if (totalMatches === null) {
+      const fallbackAgg = await db
+        .prepare(
+          `SELECT COUNT(*) AS cnt, COALESCE(SUM(r.amount_naira), 0) AS total_amt ${joinSql} ${whereSql}`
+        )
+        .bind(...params)
+        .first<{ cnt: number; total_amt: number }>();
+      totalMatches = Number(fallbackAgg?.cnt ?? (rowsRes.results || []).length);
+      totalAmountNaira = Number(fallbackAgg?.total_amt ?? 0);
+    }
+  } else {
+    const [rRes, aggRow] = await Promise.all([
+      rowsPromise,
+      db
+        .prepare(
+          `SELECT COUNT(*) AS cnt, COALESCE(SUM(r.amount_naira), 0) AS total_amt ${joinSql} ${whereSql}`
+        )
+        .bind(...params)
+        .first<{ cnt: number; total_amt: number }>(),
+    ]);
+    rowsRes = rRes;
+    totalMatches = Number(aggRow?.cnt ?? (rowsRes.results || []).length);
+    totalAmountNaira = Number(aggRow?.total_amt ?? 0);
+  }
 
   const rows = rowsRes.results || [];
   const items = rows.map((r) =>
@@ -243,8 +302,8 @@ projectsRouter.get('/projects', async (c) => {
   return c.json({
     ok: true,
     available: true,
-    totalMatches: Number(aggRow?.cnt ?? rows.length),
-    totalAmountNaira: Number(aggRow?.total_amt ?? 0),
+    totalMatches: totalMatches ?? rows.length,
+    totalAmountNaira: totalAmountNaira ?? 0,
     limit,
     offset,
     items,
