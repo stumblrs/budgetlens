@@ -19,7 +19,9 @@ import type { ResolvedRecordProvenance } from '../utils/citationFormatter';
 import {
   exportEvidenceSheetDocx,
   exportEvidenceSheetPdf,
+  type TabularDossierSpec,
 } from '../utils/documentExporter';
+import { ExtractedPdfPreview } from './ExtractedPdfPreview';
 import type { GemmaReviewPayload } from '../utils/gemmaReview';
 import {
   buildRecordDossierUrl,
@@ -515,67 +517,110 @@ export const OfficialRecordCard: React.FC<OfficialRecordCardProps> = ({
           >
             <div>
               <h3 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>
-                Virtual Source Schedule Ledger Context
+                Verified Schedule Extract (PDF &amp; Ledger)
               </h3>
               <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                {siblingContext.scopeLabel} · Clean structured ledger replacing noisy raw PDF scans
+                {siblingContext.scopeLabel} · Generated from verified extracted records
               </div>
             </div>
           </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
-                  <th style={{ padding: '0.55rem 0.95rem' }}>Code</th>
-                  <th style={{ padding: '0.55rem 0.95rem' }}>Schedule Line Item</th>
-                  <th style={{ padding: '0.55rem 0.95rem' }}>Executing MDA</th>
-                  <th style={{ padding: '0.55rem 0.95rem', textAlign: 'right' }}>Allocation (₦)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {siblingContext.rows.map(({ record, isTarget }, idx) => (
-                  <tr
-                    key={`${record.recordIdentity.id}-${idx}`}
-                    onClick={() => {
-                      if (!isTarget) onSelectSiblingRecord?.(record);
-                    }}
-                    style={{
-                      borderBottom: '1px solid #f1f5f9',
-                      backgroundColor: isTarget ? '#ecfdf5' : '#ffffff',
-                      cursor: !isTarget && onSelectSiblingRecord ? 'pointer' : 'default',
-                    }}
-                  >
-                    <td className="font-mono" style={{ padding: '0.55rem 0.95rem', fontWeight: 700, color: isTarget ? '#047857' : '#059669' }}>
-                      {record.recordIdentity.projectCode || 'ERGP'}
-                    </td>
-                    <td style={{ padding: '0.55rem 0.95rem', fontWeight: isTarget ? 700 : 500, color: 'var(--text-primary)' }}>
-                      {record.recordIdentity.verbatimProjectName}
-                      {isTarget && (
-                        <span
-                          className="editorial-pill font-mono"
-                          style={{
-                            marginLeft: '0.45rem',
-                            fontSize: '0.62rem',
-                            backgroundColor: '#059669',
-                            color: '#ffffff',
-                            borderColor: '#059669',
-                          }}
-                        >
-                          TARGET LINE
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ padding: '0.55rem 0.95rem', color: 'var(--text-muted)' }}>
-                      {record.mdaGovernanceTaxonomy.mdaName}
-                    </td>
-                    <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.95rem', textAlign: 'right', fontWeight: 700 }}>
-                      {formatNairaExact(record.recordIdentity.amountNaira)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ padding: '0.85rem' }}>
+            <ExtractedPdfPreview
+              spec={{
+                filenameBase: `BudgetLens_FY${effectiveYear}_${projectCode}_Extract`,
+                eyebrow: `BUDGETLENS VERIFIED RECORD & SCHEDULE EXTRACT · FY ${effectiveYear}`,
+                title: project.projectName,
+                subtitle: `${agencyName} · Page ${project.page} · ${president.presidentName} (${president.termLabel})`,
+                orientation: 'portrait',
+                metadata: [
+                  { label: 'Project Code', value: projectCode },
+                  { label: 'Fiscal Year', value: `FY ${effectiveYear}` },
+                  { label: 'Schedule Page', value: `Page ${project.page}` },
+                  { label: 'Source Schedule', value: provenance.filename },
+                ],
+                kpis: [
+                  { label: 'Allocation', value: formatNairaExact(project.amount) },
+                  { label: 'USD Equivalent', value: econ.formattedUsd },
+                  { label: 'Context Rows', value: String(siblingContext.rows.length) },
+                ],
+                tables: [
+                  {
+                    heading: `${siblingContext.scopeLabel} (Page ${project.page})`,
+                    columns: ['Code', 'Schedule Line Item', 'Executing MDA', 'Allocation (₦)'],
+                    rows: siblingContext.rows.map(({ record, isTarget }) => [
+                      `${record.recordIdentity.projectCode || 'ERGP'}${isTarget ? ' [CITED]' : ''}`,
+                      record.recordIdentity.verbatimProjectName,
+                      record.mdaGovernanceTaxonomy.mdaName,
+                      formatNairaExact(record.recordIdentity.amountNaira),
+                    ]),
+                    rightAlignColumns: [3],
+                  },
+                ],
+                sha256: provenance.sha256,
+                sourceFilename: provenance.filename,
+                permalink: newTabUrl,
+                footnote: `Generated directly from verified BudgetLens FY ${effectiveYear} appropriation records.`,
+              } satisfies TabularDossierSpec}
+              title={`FY ${effectiveYear} Record & Page ${project.page} PDF`}
+              subtitle={projectCode}
+              minHeight="52vh"
+            >
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+                      <th style={{ padding: '0.55rem 0.95rem' }}>Code</th>
+                      <th style={{ padding: '0.55rem 0.95rem' }}>Schedule Line Item</th>
+                      <th style={{ padding: '0.55rem 0.95rem' }}>Executing MDA</th>
+                      <th style={{ padding: '0.55rem 0.95rem', textAlign: 'right' }}>Allocation (₦)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {siblingContext.rows.map(({ record, isTarget }, idx) => (
+                      <tr
+                        key={`${record.recordIdentity.id}-${idx}`}
+                        onClick={() => {
+                          if (!isTarget) onSelectSiblingRecord?.(record);
+                        }}
+                        style={{
+                          borderBottom: '1px solid #f1f5f9',
+                          backgroundColor: isTarget ? '#ecfdf5' : '#ffffff',
+                          cursor: !isTarget && onSelectSiblingRecord ? 'pointer' : 'default',
+                        }}
+                      >
+                        <td className="font-mono" style={{ padding: '0.55rem 0.95rem', fontWeight: 700, color: isTarget ? '#047857' : '#059669' }}>
+                          {record.recordIdentity.projectCode || 'ERGP'}
+                        </td>
+                        <td style={{ padding: '0.55rem 0.95rem', fontWeight: isTarget ? 700 : 500, color: 'var(--text-primary)' }}>
+                          {record.recordIdentity.verbatimProjectName}
+                          {isTarget && (
+                            <span
+                              className="editorial-pill font-mono"
+                              style={{
+                                marginLeft: '0.45rem',
+                                fontSize: '0.62rem',
+                                backgroundColor: '#059669',
+                                color: '#ffffff',
+                                borderColor: '#059669',
+                              }}
+                            >
+                              TARGET LINE
+                            </span>
+                          )}
+                        </td>
+                        <td style={{ padding: '0.55rem 0.95rem', color: 'var(--text-muted)' }}>
+                          {record.mdaGovernanceTaxonomy.mdaName}
+                        </td>
+                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.95rem', textAlign: 'right', fontWeight: 700 }}>
+                          {formatNairaExact(record.recordIdentity.amountNaira)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </ExtractedPdfPreview>
           </div>
         </div>
       )}

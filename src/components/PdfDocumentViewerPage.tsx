@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { apiUrl } from '../services/apiClient';
 import { ArrowLeft, ChevronLeft, ChevronRight, FileText, Search, X } from 'lucide-react';
-import { readAppUrlState, syncUrlParams } from '../utils/urlState';
+import { getPresidentForYear } from '../data/presidentialTerms';
+import type { TabularDossierSpec } from '../utils/documentExporter';
+import { buildCanonicalPermalink, readAppUrlState, syncUrlParams } from '../utils/urlState';
 import { ExpandableText } from './ExpandableText';
+import { ExtractedPdfPreview } from './ExtractedPdfPreview';
 
 interface MinProjectRow {
   id: string;
@@ -38,25 +41,37 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState(urlState.q || '');
+  const [debouncedQuery, setDebouncedQuery] = useState((urlState.q || '').trim());
   const [activePage, setActivePage] = useState<number>(citedPage);
   const [viewMode, setViewMode] = useState<'page' | 'all'>('page');
   const highlightedRef = useRef<HTMLTableRowElement>(null);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim());
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     setLoading(true);
     setError(null);
     let active = true;
+    const ctrl = new AbortController();
     const params = new URLSearchParams({
       year: String(docYear),
       sort: 'page_asc',
       limit: '200',
     });
-    if (viewMode === 'page' && activePage > 0) {
+    if (debouncedQuery) {
+      params.set('q', debouncedQuery);
+    } else if (viewMode === 'page' && activePage > 0) {
       params.set('page', String(activePage));
-    } else if (searchQuery.trim()) {
-      params.set('q', searchQuery.trim());
     }
-    fetch(apiUrl(`/api/v1/projects?${params.toString()}`), { cache: 'no-cache' })
+    fetch(apiUrl(`/api/v1/projects?${params.toString()}`), {
+      cache: 'no-cache',
+      signal: ctrl.signal,
+    })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -67,16 +82,17 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
         setRows(list);
         setLoading(false);
       })
-      .catch(() => {
-        if (!active) return;
+      .catch((err) => {
+        if (!active || err?.name === 'AbortError') return;
         setError(`Could not load FY ${docYear} appropriation schedule.`);
         setLoading(false);
       });
 
     return () => {
       active = false;
+      ctrl.abort();
     };
-  }, [docYear, activePage, viewMode, searchQuery]);
+  }, [docYear, activePage, viewMode, debouncedQuery]);
 
   useEffect(() => {
     if (!loading && highlightedRef.current) {
@@ -123,6 +139,45 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
     }
     return Array.from(grouped.entries()).sort((a, b) => a[0] - b[0]);
   }, [filteredRows]);
+
+  const pdfSpec = useMemo<TabularDossierSpec | null>(() => {
+    if (pagesToRender.length === 0) return null;
+    const pres = getPresidentForYear(docYear);
+    const flatRows = pagesToRender.flatMap(([, pageRows]) => pageRows);
+    const totalNaira = flatRows.reduce((s, r) => s + Number(r.amount || 0), 0);
+    return {
+      filenameBase: `BudgetLens_FY${docYear}_${trimmedQuery ? 'Search_Extract' : `Page_${activePage}_Extract`}`,
+      eyebrow: `BUDGETLENS VERIFIED SCHEDULE EXTRACT · FY ${docYear}`,
+      title: `FY ${docYear} Appropriation Act — ${
+        trimmedQuery ? `Search Extract ("${searchQuery.trim()}")` : `Page ${activePage} Official Extract`
+      }`,
+      subtitle: `${pres.presidentName} (${pres.termLabel}) · Generated from verified extracted appropriation records`,
+      orientation: 'portrait',
+      metadata: [
+        { label: 'Fiscal Year', value: `FY ${docYear}` },
+        { label: 'Administration', value: `${pres.presidentName} (${pres.party})` },
+        { label: 'Scope', value: trimmedQuery ? `Search: ${searchQuery.trim()}` : `Schedule Page ${activePage}` },
+      ],
+      kpis: [
+        { label: 'Line Items', value: flatRows.length.toLocaleString('en-US') },
+        { label: 'Extract Total', value: formatNairaExact(totalNaira) },
+        { label: 'Pages Included', value: String(pagesToRender.length) },
+      ],
+      tables: pagesToRender.map(([pageNo, pageRows]) => ({
+        heading: `Schedule Page ${pageNo} (${pageRows.length} item${pageRows.length === 1 ? '' : 's'})`,
+        columns: ['Code', 'Project / Line Item Description', 'MDA / Agency', 'Amount (₦)'],
+        rows: pageRows.map((r) => [
+          r.projectCode || r.budgetCode || '—',
+          r.projectName || '—',
+          r.agency || 'Federal MDA',
+          formatNairaExact(r.amount),
+        ]),
+        rightAlignColumns: [3],
+      })),
+      permalink: buildCanonicalPermalink({ tab: 'pdf', year: docYear, page: activePage }),
+      footnote: `Generated directly from verified BudgetLens FY ${docYear} appropriation ledger records.`,
+    };
+  }, [pagesToRender, docYear, trimmedQuery, searchQuery, activePage]);
 
   const pageIdx = availablePages.indexOf(activePage);
   const canPrev = pageIdx > 0;
@@ -340,148 +395,186 @@ export const PdfDocumentViewerPage: React.FC<PdfDocumentViewerPageProps> = ({
                 className="font-mono"
                 style={{
                   width: '100%',
-                  maxWidth: '880px',
+                  maxWidth: '940px',
                   color: '#e2e8f0',
                   fontSize: '0.75rem',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: '0.45rem',
                 }}
               >
-                Found {filteredRows.length.toLocaleString()} matching record(s) across FY {docYear}
-                {filteredRows.length > 250 ? ' (showing first 250)' : ''}
+                <span>
+                  Found {filteredRows.length.toLocaleString()} matching record(s) across FY {docYear}
+                  {filteredRows.length > 250 ? ' (showing first 250)' : ''}
+                </span>
+                {pagesToRender.slice(0, 12).map(([pNo, pRows]) => (
+                  <button
+                    key={pNo}
+                    type="button"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setViewMode('page');
+                      handlePageChange(pNo);
+                    }}
+                    style={{
+                      padding: '0.14rem 0.48rem',
+                      borderRadius: '4px',
+                      border: '1px solid #10b981',
+                      backgroundColor: 'rgba(16, 185, 129, 0.16)',
+                      color: '#6ee7b7',
+                      fontSize: '0.68rem',
+                      cursor: 'pointer',
+                    }}
+                    title={`Jump to Page ${pNo}`}
+                  >
+                    p.{pNo} ({pRows.length})
+                  </button>
+                ))}
               </div>
             )}
 
-            {pagesToRender.map(([pageNo, pageRows]) => (
-              <div
-                key={pageNo}
-                style={{
-                  width: '100%',
-                  maxWidth: '880px',
-                  backgroundColor: '#ffffff',
-                  color: '#0f172a',
-                  borderRadius: '3px',
-                  boxShadow: '0 12px 28px rgba(0, 0, 0, 0.38)',
-                  padding: '2rem 2.25rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                }}
+            <div style={{ width: '100%', maxWidth: '940px' }}>
+              <ExtractedPdfPreview
+                spec={pdfSpec}
+                title={`FY ${docYear} Schedule Extract PDF`}
+                subtitle={trimmedQuery ? `${filteredRows.length} matches` : `Page ${activePage}`}
               >
-                {/* Official Document Page Header */}
-                <div
-                  style={{
-                    borderBottom: '2px solid #0f172a',
-                    paddingBottom: '0.65rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-end',
-                    gap: '1rem',
-                  }}
-                >
-                  <div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', alignItems: 'center' }}>
+                  {pagesToRender.map(([pageNo, pageRows]) => (
                     <div
+                      key={pageNo}
                       style={{
-                        fontSize: '0.68rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        color: '#475569',
+                        width: '100%',
+                        backgroundColor: '#ffffff',
+                        color: '#0f172a',
+                        borderRadius: '3px',
+                        boxShadow: '0 12px 28px rgba(0, 0, 0, 0.38)',
+                        padding: '2rem 2.25rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1rem',
                       }}
                     >
-                      Federal Republic of Nigeria · Budget Office Schedule
-                    </div>
-                    <div className="font-editorial" style={{ fontSize: '1.08rem', fontWeight: 700, color: '#0f172a' }}>
-                      {docYear} Appropriation Act — Schedule of Projects
-                    </div>
-                  </div>
-                  <div className="font-mono" style={{ fontSize: '0.76rem', fontWeight: 700, color: '#047857' }}>
-                    PDF PAGE {pageNo}
-                  </div>
-                </div>
+                      {/* Official Document Page Header */}
+                      <div
+                        style={{
+                          borderBottom: '2px solid #0f172a',
+                          paddingBottom: '0.65rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'flex-end',
+                          gap: '1rem',
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              fontSize: '0.68rem',
+                              fontWeight: 700,
+                              letterSpacing: '0.08em',
+                              textTransform: 'uppercase',
+                              color: '#475569',
+                            }}
+                          >
+                            Federal Republic of Nigeria · Budget Office Schedule
+                          </div>
+                          <div className="font-editorial" style={{ fontSize: '1.08rem', fontWeight: 700, color: '#0f172a' }}>
+                            {docYear} Appropriation Act — Schedule of Projects
+                          </div>
+                        </div>
+                        <div className="font-mono" style={{ fontSize: '0.76rem', fontWeight: 700, color: '#047857' }}>
+                          VERIFIED EXTRACT · PAGE {pageNo}
+                        </div>
+                      </div>
 
-                {/* Page Line-Item Table */}
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #cbd5e1', textAlign: 'left', color: '#475569' }}>
-                      <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, width: '110px' }}>Code</th>
-                      <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700 }}>Project / Line Item Description</th>
-                      <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, width: '175px' }}>MDA / Agency</th>
-                      <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, textAlign: 'right', width: '130px' }}>
-                        Amount (₦)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pageRows.map((r, idx) => {
-                      const hit = isTargetRow(r);
-                      return (
-                        <tr
-                          key={`${r.id}-${idx}`}
-                          ref={hit ? highlightedRef : undefined}
-                          style={{
-                            borderBottom: '1px solid #e2e8f0',
-                            backgroundColor: hit ? '#ecfdf5' : undefined,
-                            outline: hit ? '2px solid #10b981' : undefined,
-                          }}
-                        >
-                          <td className="font-mono" style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', fontWeight: 600, color: '#334155' }}>
-                            <div>{r.projectCode || r.budgetCode || '—'}</div>
-                            {hit && (
-                              <span
+                      {/* Page Line-Item Table */}
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                        <thead>
+                          <tr style={{ borderBottom: '1px solid #cbd5e1', textAlign: 'left', color: '#475569' }}>
+                            <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, width: '110px' }}>Code</th>
+                            <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700 }}>Project / Line Item Description</th>
+                            <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, width: '175px' }}>MDA / Agency</th>
+                            <th style={{ padding: '0.45rem 0.4rem', fontWeight: 700, textAlign: 'right', width: '130px' }}>
+                              Amount (₦)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {pageRows.map((r, idx) => {
+                            const hit = isTargetRow(r);
+                            return (
+                              <tr
+                                key={`${r.id}-${idx}`}
+                                ref={hit ? highlightedRef : undefined}
                                 style={{
-                                  display: 'inline-block',
-                                  marginTop: '0.2rem',
-                                  fontSize: '0.62rem',
-                                  backgroundColor: '#047857',
-                                  color: '#ffffff',
-                                  padding: '0.08rem 0.35rem',
-                                  borderRadius: '3px',
-                                  fontWeight: 700,
+                                  borderBottom: '1px solid #e2e8f0',
+                                  backgroundColor: hit ? '#ecfdf5' : undefined,
+                                  outline: hit ? '2px solid #10b981' : undefined,
                                 }}
                               >
-                                CITED RECORD
-                              </span>
-                            )}
-                          </td>
-                          <td style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', color: '#0f172a', lineHeight: 1.45 }}>
-                            <div style={{ fontWeight: hit ? 700 : 500 }}>
-                              <ExpandableText text={r.projectName} maxChars={180} />
-                            </div>
-                            <div className="font-mono" style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '0.15rem' }}>
-                              {r.id} · {r.spendingType || 'CAPITAL'} · {r.sector || 'Federal'}
-                            </div>
-                          </td>
-                          <td style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', color: '#475569', fontSize: '0.73rem' }}>
-                            {r.agency || 'Federal MDA'}
-                          </td>
-                          <td
-                            className="font-mono tabular-nums"
-                            style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', textAlign: 'right', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}
-                          >
-                            {formatNairaExact(r.amount)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                                <td className="font-mono" style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', fontWeight: 600, color: '#334155' }}>
+                                  <div>{r.projectCode || r.budgetCode || '—'}</div>
+                                  {hit && (
+                                    <span
+                                      style={{
+                                        display: 'inline-block',
+                                        marginTop: '0.2rem',
+                                        fontSize: '0.62rem',
+                                        backgroundColor: '#047857',
+                                        color: '#ffffff',
+                                        padding: '0.08rem 0.35rem',
+                                        borderRadius: '3px',
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      CITED RECORD
+                                    </span>
+                                  )}
+                                </td>
+                                <td style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', color: '#0f172a', lineHeight: 1.45 }}>
+                                  <div style={{ fontWeight: hit ? 700 : 500 }}>
+                                    <ExpandableText text={r.projectName} maxChars={180} />
+                                  </div>
+                                  <div className="font-mono" style={{ fontSize: '0.68rem', color: '#64748b', marginTop: '0.15rem' }}>
+                                    {r.id} · {r.spendingType || 'CAPITAL'} · {r.sector || 'Federal'}
+                                  </div>
+                                </td>
+                                <td style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', color: '#475569', fontSize: '0.73rem' }}>
+                                  {r.agency || 'Federal MDA'}
+                                </td>
+                                <td
+                                  className="font-mono tabular-nums"
+                                  style={{ padding: '0.5rem 0.4rem', verticalAlign: 'top', textAlign: 'right', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap' }}
+                                >
+                                  {formatNairaExact(r.amount)}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
 
-                {/* Official Document Page Footer */}
-                <div
-                  className="font-mono"
-                  style={{
-                    borderTop: '1px solid #e2e8f0',
-                    paddingTop: '0.55rem',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '0.68rem',
-                    color: '#64748b',
-                  }}
-                >
-                  <span>Source: Budget Office of the Federation · FY {docYear}</span>
-                  <span>Page {pageNo} · {pageRows.length} item(s) shown</span>
+                      {/* Official Document Page Footer */}
+                      <div
+                        className="font-mono"
+                        style={{
+                          borderTop: '1px solid #e2e8f0',
+                          paddingTop: '0.55rem',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          fontSize: '0.68rem',
+                          color: '#64748b',
+                        }}
+                      >
+                        <span>Source: Budget Office of the Federation · FY {docYear}</span>
+                        <span>Page {pageNo} · {pageRows.length} item(s) shown</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
+              </ExtractedPdfPreview>
+            </div>
           </>
         )}
       </div>

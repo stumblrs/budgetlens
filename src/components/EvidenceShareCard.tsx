@@ -312,7 +312,7 @@ export const EvidenceShareCard: React.FC<Props> = ({ project, financialYear }) =
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', color: 'var(--text-secondary)' }}>
               <Hash size={13} color="var(--emerald-primary)" style={{ flexShrink: 0 }} />
               <span className="font-mono" style={{ wordBreak: 'break-all' }}>
-                <strong>Source PDF:</strong> {provenance.filename}
+                <strong>Source Schedule:</strong> {provenance.filename}
                 {provenance.shortSha256 ? ` · SHA-256: ${provenance.shortSha256}…` : ''}
               </span>
             </div>

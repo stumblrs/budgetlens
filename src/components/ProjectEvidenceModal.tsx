@@ -1081,8 +1081,8 @@ Verified via BudgetLens Civic Fiscal Observatory (${canonicalPermalink})`;
                       border: '1px solid #a7f3d0',
                     }}
                   >
-                    {provenance.matchedExactFile ? 'Matched Source PDF' : 'Primary FY Schedule'}
-                    {provenance.fileCountForYear > 1 ? ` · ${provenance.fileCountForYear} FY ${effectiveYear} PDFs` : ''}
+                    {provenance.matchedExactFile ? 'Matched Schedule Record' : 'Primary FY Schedule'}
+                    {provenance.fileCountForYear > 1 ? ` · ${provenance.fileCountForYear} FY ${effectiveYear} Schedules` : ''}
                   </span>
                 </div>
 
@@ -1669,7 +1669,7 @@ Verified via BudgetLens Civic Fiscal Observatory (${canonicalPermalink})`;
               onClick={() => setActiveSubTab('pdf')}
               className="editorial-btn-primary"
             >
-              <FileText size={14} /> Official Record Card (p.{project.page})
+              <FileText size={14} /> Official Record PDF (p.{project.page})
             </button>
           </div>
         </div>
