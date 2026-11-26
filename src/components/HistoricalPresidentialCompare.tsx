@@ -142,6 +142,7 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
         netAddedNairaM: r.netAddedNairaM,
         netAddedDomesticNairaM: r.netAddedDomesticNairaM,
         pctChangeNaira: r.pctChangeNaira,
+        keyDriverHeadline: r.keyDriverHeadline as string | null,
         note: r.methodologyNote,
       }));
     }
@@ -163,6 +164,7 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
       netAddedNairaM: r.netAddedNairaM,
       netAddedDomesticNairaM: r.netAddedDomesticNairaM,
       pctChangeNaira: r.startTotalNairaM > 0 ? Number(((r.netAddedNairaM / r.startTotalNairaM) * 100).toFixed(1)) : 0,
+      keyDriverHeadline: null as string | null,
       note: r.note,
     }));
   }, [debtBasisMode, handoverDebtLedger, adminDebtProjection]);
@@ -918,8 +920,8 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
                 </div>
 
                 {term.note && (
-                  <div style={{ fontSize: '0.68rem', color: '#64748b', display: 'flex', gap: '0.3rem', alignItems: 'flex-start', borderTop: '1px solid #f1f5f9', paddingTop: '0.5rem' }}>
-                    <Info size={12} style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <div style={{ fontSize: '0.75rem', color: '#475569', lineHeight: 1.48, display: 'flex', gap: '0.35rem', alignItems: 'flex-start', borderTop: '1px solid #f1f5f9', paddingTop: '0.55rem' }}>
+                    <Info size={13} style={{ flexShrink: 0, marginTop: '3px' }} />
                     <span>{term.note}</span>
                   </div>
                 )}
@@ -1106,61 +1108,145 @@ export const HistoricalPresidentialCompare: React.FC<HistoricalPresidentialCompa
               </div>
 
               {/* Breakdown Table */}
-              <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                <table style={{ width: '100%', minWidth: '680px', borderCollapse: 'collapse', fontSize: '0.77rem' }}>
-                  <thead>
-                    <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', textAlign: 'left' }}>
-                      <th style={{ padding: '0.5rem 0.65rem' }}>Administration</th>
-                      <th style={{ padding: '0.5rem 0.65rem' }}>DMO Window</th>
-                      <th style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>Start → End (USD)</th>
-                      <th style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>Net USD Delta</th>
-                      <th style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>Ext. USD Delta</th>
-                      <th style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>Start → End (Naira)</th>
-                      <th style={{ padding: '0.5rem 0.65rem', textAlign: 'right' }}>Net Naira Delta</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayedDebtRows.map((row) => (
-                      <tr key={row.presidentId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-                        <td style={{ padding: '0.55rem 0.65rem', fontWeight: 700, color: 'var(--text-primary)' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <PresidentAvatar
-                              src={row.portraitPath}
-                              name={row.presidentName}
-                              initials={row.initials}
-                              accentColor={row.accentColor}
-                              size={28}
-                            />
-                            <div>
-                              <div>{row.presidentName}</div>
-                              <div style={{ fontSize: '0.66rem', fontWeight: 400, color: 'var(--text-muted)' }}>{row.note}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="font-mono" style={{ padding: '0.55rem 0.65rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-                          {row.windowLabel}
-                        </td>
-                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.65rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          ${(row.startTotalUsdM / 1e3).toFixed(1)}B → ${(row.endTotalUsdM / 1e3).toFixed(1)}B
-                        </td>
-                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.65rem', textAlign: 'right', fontWeight: 700, color: row.netAddedUsdM >= 0 ? '#b45309' : '#059669', whiteSpace: 'nowrap' }}>
-                          {row.netAddedUsdM >= 0 ? '+' : ''}${(row.netAddedUsdM / 1e3).toFixed(2)}B ({row.pctChangeUsd >= 0 ? '+' : ''}{row.pctChangeUsd}%)
-                        </td>
-                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.65rem', textAlign: 'right', fontWeight: 700, color: (row.netAddedExternalUsdM || 0) >= 0 ? '#991b1b' : '#059669', whiteSpace: 'nowrap' }}>
-                          {row.netAddedExternalUsdM !== null
-                            ? `${row.netAddedExternalUsdM >= 0 ? '+' : ''}$${(row.netAddedExternalUsdM / 1e3).toFixed(2)}B`
-                            : 'N/A'}
-                        </td>
-                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.65rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                          ₦{(row.startTotalNairaM / 1e6).toFixed(2)}T → ₦{(row.endTotalNairaM / 1e6).toFixed(2)}T
-                        </td>
-                        <td className="font-mono tabular-nums" style={{ padding: '0.55rem 0.65rem', textAlign: 'right', fontWeight: 700, color: row.netAddedNairaM >= 0 ? '#b45309' : '#059669', whiteSpace: 'nowrap' }}>
-                          {row.netAddedNairaM >= 0 ? '+' : ''}₦{(row.netAddedNairaM / 1e6).toFixed(2)}T ({row.pctChangeNaira >= 0 ? '+' : ''}{row.pctChangeNaira}%)
-                        </td>
+              <div>
+                <div className="font-mono mobile-only-block" style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                  ← Swipe columns horizontally on small screens →
+                </div>
+                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', border: '1px solid var(--border-subtle)', borderRadius: '8px' }}>
+                  <table style={{ width: '100%', minWidth: '720px', borderCollapse: 'collapse', fontSize: '0.78rem' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', textAlign: 'left' }}>
+                        <th style={{ padding: '0.55rem 0.7rem', minWidth: '200px' }}>Administration</th>
+                        <th style={{ padding: '0.55rem 0.7rem' }}>DMO Window</th>
+                        <th style={{ padding: '0.55rem 0.7rem', textAlign: 'right' }}>Start → End (USD)</th>
+                        <th style={{ padding: '0.55rem 0.7rem', textAlign: 'right' }}>Net USD Delta</th>
+                        <th style={{ padding: '0.55rem 0.7rem', textAlign: 'right' }}>Ext. USD Delta</th>
+                        <th style={{ padding: '0.55rem 0.7rem', textAlign: 'right' }}>Start → End (Naira)</th>
+                        <th style={{ padding: '0.55rem 0.7rem', textAlign: 'right' }}>Net Naira Delta</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {displayedDebtRows.map((row) => (
+                        <tr key={row.presidentId} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                          <td style={{ padding: '0.65rem 0.7rem', fontWeight: 700, color: 'var(--text-primary)', minWidth: '200px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                              <PresidentAvatar
+                                src={row.portraitPath}
+                                name={row.presidentName}
+                                initials={row.initials}
+                                accentColor={row.accentColor}
+                                size={30}
+                              />
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+                                  {row.presidentName}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: '0.64rem',
+                                    fontWeight: 700,
+                                    padding: '0.08rem 0.36rem',
+                                    borderRadius: '4px',
+                                    backgroundColor: row.party === 'PDP' ? '#dcfce7' : '#e0f2fe',
+                                    color: row.party === 'PDP' ? '#15803d' : '#0369a1',
+                                  }}
+                                >
+                                  {row.party}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="font-mono" style={{ padding: '0.65rem 0.7rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+                            {row.windowLabel}
+                          </td>
+                          <td className="font-mono tabular-nums" style={{ padding: '0.65rem 0.7rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            ${(row.startTotalUsdM / 1e3).toFixed(1)}B → ${(row.endTotalUsdM / 1e3).toFixed(1)}B
+                          </td>
+                          <td className="font-mono tabular-nums" style={{ padding: '0.65rem 0.7rem', textAlign: 'right', fontWeight: 700, color: row.netAddedUsdM >= 0 ? '#b45309' : '#059669', whiteSpace: 'nowrap' }}>
+                            {row.netAddedUsdM >= 0 ? '+' : ''}${(row.netAddedUsdM / 1e3).toFixed(2)}B ({row.pctChangeUsd >= 0 ? '+' : ''}{row.pctChangeUsd}%)
+                          </td>
+                          <td className="font-mono tabular-nums" style={{ padding: '0.65rem 0.7rem', textAlign: 'right', fontWeight: 700, color: (row.netAddedExternalUsdM || 0) >= 0 ? '#991b1b' : '#059669', whiteSpace: 'nowrap' }}>
+                            {row.netAddedExternalUsdM !== null
+                              ? `${row.netAddedExternalUsdM >= 0 ? '+' : ''}$${(row.netAddedExternalUsdM / 1e3).toFixed(2)}B`
+                              : 'N/A'}
+                          </td>
+                          <td className="font-mono tabular-nums" style={{ padding: '0.65rem 0.7rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                            ₦{(row.startTotalNairaM / 1e6).toFixed(2)}T → ₦{(row.endTotalNairaM / 1e6).toFixed(2)}T
+                          </td>
+                          <td className="font-mono tabular-nums" style={{ padding: '0.65rem 0.7rem', textAlign: 'right', fontWeight: 700, color: row.netAddedNairaM >= 0 ? '#b45309' : '#059669', whiteSpace: 'nowrap' }}>
+                            {row.netAddedNairaM >= 0 ? '+' : ''}₦{(row.netAddedNairaM / 1e6).toFixed(2)}T ({row.pctChangeNaira >= 0 ? '+' : ''}{row.pctChangeNaira}%)
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Readable Debt Drivers & Methodology Notes Grid */}
+              <div>
+                <div
+                  style={{
+                    fontSize: '0.73rem',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: '#475569',
+                    marginBottom: '0.55rem',
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  Administration Debt Drivers &amp; Methodology Notes
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))',
+                    gap: '0.65rem',
+                  }}
+                >
+                  {displayedDebtRows.map((row) => (
+                    <div
+                      key={`${row.presidentId}-note`}
+                      style={{
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid var(--border-subtle)',
+                        borderLeft: `3px solid ${row.accentColor}`,
+                        borderRadius: '8px',
+                        padding: '0.72rem 0.85rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.28rem',
+                        minWidth: 0,
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                          <PresidentAvatar
+                            src={row.portraitPath}
+                            name={row.presidentName}
+                            initials={row.initials}
+                            accentColor={row.accentColor}
+                            size={22}
+                          />
+                          <span style={{ fontSize: '0.81rem', fontWeight: 700, color: '#0f172a' }}>
+                            {row.presidentName}
+                          </span>
+                        </div>
+                        <span className="font-mono" style={{ fontSize: '0.69rem', color: '#64748b' }}>
+                          {row.windowLabel}
+                        </span>
+                      </div>
+                      {row.keyDriverHeadline && (
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: row.accentColor, lineHeight: 1.4 }}>
+                          {row.keyDriverHeadline}
+                        </div>
+                      )}
+                      <p style={{ fontSize: '0.78rem', lineHeight: 1.55, color: '#334155', margin: 0 }}>
+                        {row.note}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
