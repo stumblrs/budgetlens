@@ -781,6 +781,127 @@ function defaultNoMtefStage(fy: number): MtefStageData {
   };
 }
 
+function normalizeApiNocopoStage(raw: unknown): NocopoStageData {
+  if (raw && !Array.isArray(raw) && typeof raw === 'object') {
+    const obj = raw as Partial<NocopoStageData>;
+    return {
+      status: obj.status || 'NO_PUBLIC_CONTRACT',
+      matchMethod: obj.matchMethod || 'NONE',
+      confidenceScore: Number(obj.confidenceScore || 0),
+      awardedContractCount: Number(obj.awardedContractCount || 0),
+      planningCount: Number(obj.planningCount || 0),
+      totalAwardedNaira: Number(obj.totalAwardedNaira || 0),
+      totalNocopoDisbursedNaira: Number(obj.totalNocopoDisbursedNaira || 0),
+      distinctContractorCount: Number(obj.distinctContractorCount || 0),
+      nonCompetitiveCount: Number(obj.nonCompetitiveCount || 0),
+      contractors: Array.isArray(obj.contractors) ? obj.contractors : [],
+      contracts: Array.isArray(obj.contracts) ? obj.contracts : [],
+    };
+  }
+  const rows = Array.isArray(raw) ? (raw as Array<Record<string, unknown>>) : [];
+  const contracts: LifecycleContractItem[] = rows.map((r) => ({
+    ocid: String(r.ocds_release_id || r.ocid || ''),
+    financialYear: Number(r.financial_year || r.financialYear || 0),
+    stage: String(r.stage || 'planning'),
+    title: String(r.budget_title || r.title || ''),
+    mdaName: String(r.buyer_name || r.mdaName || ''),
+    contractorName: r.contractor_name ? String(r.contractor_name) : null,
+    bppContractorId: r.contractor_key ? String(r.contractor_key) : null,
+    awardNaira: Number(r.award_amount_naira || r.awardNaira || 0),
+    paidNaira: Number(r.disbursed_amount_naira || r.paidNaira || 0),
+    awardDate: r.award_date ? String(r.award_date) : null,
+    procurementMethod: r.procurement_method ? String(r.procurement_method) : null,
+  }));
+  const awarded = contracts.filter((c) => c.awardNaira > 0 || Boolean(c.contractorName));
+  const totalAwardedNaira = awarded.reduce((s, c) => s + c.awardNaira, 0);
+  const totalNocopoDisbursedNaira = contracts.reduce((s, c) => s + c.paidNaira, 0);
+  const byContractor = new Map<string, LifecycleContractorSummary>();
+  for (const c of awarded) {
+    const name = c.contractorName || 'Unnamed Contractor';
+    const cur = byContractor.get(name) || {
+      contractorName: name,
+      bppContractorId: c.bppContractorId,
+      awardCount: 0,
+      awardedNaira: 0,
+      nocopoDisbursedNaira: 0,
+      mdaGovspendCount: 0,
+      mdaGovspendPaidNaira: 0,
+      totalGovspendCount: 0,
+      totalGovspendPaidNaira: 0,
+      nonCompetitiveCount: 0,
+      procurementMethods: [],
+      years: [],
+    };
+    cur.awardCount += 1;
+    cur.awardedNaira += c.awardNaira;
+    cur.nocopoDisbursedNaira += c.paidNaira;
+    if (c.procurementMethod && !cur.procurementMethods.includes(c.procurementMethod)) {
+      cur.procurementMethods.push(c.procurementMethod);
+    }
+    if (c.financialYear && !cur.years.includes(c.financialYear)) {
+      cur.years.push(c.financialYear);
+    }
+    byContractor.set(name, cur);
+  }
+  const contractors = Array.from(byContractor.values());
+  const status: NocopoStageData['status'] =
+    totalNocopoDisbursedNaira > 0
+      ? 'AWARDED_AND_PAID'
+      : awarded.length > 0
+        ? 'AWARDED_UNPAID'
+        : contracts.length > 0
+          ? 'PLANNING_OR_TENDER_ONLY'
+          : 'NO_PUBLIC_CONTRACT';
+  return {
+    status,
+    matchMethod: contracts.length > 0 ? 'API_ERGP_OR_TITLE' : 'NONE',
+    confidenceScore: contracts.length > 0 ? 0.9 : 0,
+    awardedContractCount: awarded.length,
+    planningCount: Math.max(0, contracts.length - awarded.length),
+    totalAwardedNaira,
+    totalNocopoDisbursedNaira,
+    distinctContractorCount: contractors.length,
+    nonCompetitiveCount: 0,
+    contractors,
+    contracts,
+  };
+}
+
+function normalizeApiGovspendStage(raw: unknown): GovspendStageData {
+  if (raw && !Array.isArray(raw) && typeof raw === 'object') {
+    const obj = raw as Partial<GovspendStageData>;
+    return {
+      status: obj.status || 'NO_TREASURY_VOUCHER_MATCH',
+      directVoucherCount: Number(obj.directVoucherCount || 0),
+      directPaidNaira: Number(obj.directPaidNaira || 0),
+      directVouchers: Array.isArray(obj.directVouchers) ? obj.directVouchers : [],
+      vendorMdaVoucherCount: Number(obj.vendorMdaVoucherCount || 0),
+      vendorMdaPaidNaira: Number(obj.vendorMdaPaidNaira || 0),
+      vendorMdaVouchers: Array.isArray(obj.vendorMdaVouchers) ? obj.vendorMdaVouchers : [],
+    };
+  }
+  const rows = Array.isArray(raw) ? (raw as Array<Record<string, unknown>>) : [];
+  const vouchers: LifecycleVoucherItem[] = rows.map((r) => ({
+    paymentNo: String(r.payment_no || r.paymentNo || ''),
+    paymentDate: String(r.payment_date || r.paymentDate || ''),
+    financialYear: Number(r.financial_year || r.financialYear || 0),
+    organizationName: String(r.organization_name || r.organizationName || ''),
+    beneficiaryName: String(r.beneficiary_name || r.beneficiaryName || ''),
+    amountNaira: Number(r.amount_naira || r.amountNaira || 0),
+    description: String(r.description || ''),
+  }));
+  const vendorMdaPaidNaira = vouchers.reduce((s, v) => s + v.amountNaira, 0);
+  return {
+    status: vouchers.length > 0 ? 'VENDOR_MDA_PAYOUTS_RECORDED' : 'NO_TREASURY_VOUCHER_MATCH',
+    directVoucherCount: 0,
+    directPaidNaira: 0,
+    directVouchers: [],
+    vendorMdaVoucherCount: vouchers.length,
+    vendorMdaPaidNaira,
+    vendorMdaVouchers: vouchers,
+  };
+}
+
 export async function loadProjectLifecycleForRecord(target: {
   id?: string | null;
   projectCode?: string | null;
@@ -792,6 +913,7 @@ export async function loadProjectLifecycleForRecord(target: {
   const ridUp = String(target.id || '').trim().toUpperCase();
   const ucode =
     isUniqueProjectCode(target.projectCode) || isUniqueProjectCode(target.projectName);
+  const index = await loadProjectLifecycleIndex();
 
   try {
     const lookupId = encodeURIComponent(ridUp || ucode || 'lookup');
@@ -804,7 +926,19 @@ export async function loadProjectLifecycleForRecord(target: {
     if (res.ok) {
       const apiLc = await res.json();
       if (apiLc?.ok) {
-        const pop = computePaidOnPaperStatus(apiLc.nocopo || [], apiLc.govspend || []);
+        const nocopo = normalizeApiNocopoStage(apiLc.nocopo);
+        const govspend = normalizeApiGovspendStage(apiLc.govspend);
+        const pop = computePaidOnPaperStatus(nocopo, govspend);
+        const mtef =
+          (apiLc.mtef && typeof apiLc.mtef === 'object' && apiLc.mtef.status
+            ? apiLc.mtef
+            : null) ||
+          index?.mtefByYear?.[String(fy)] ||
+          defaultNoMtefStage(fy);
+        const bir =
+          (apiLc.bir && typeof apiLc.bir === 'object' && apiLc.bir.status
+            ? apiLc.bir
+            : null) || matchBirMdaEntry(index?.birByYear?.[String(fy)], target.agency);
         return {
           financialYear: fy,
           recordId: apiLc.recordId || ridUp || ucode || 'RECORD',
@@ -813,15 +947,18 @@ export async function loadProjectLifecycleForRecord(target: {
           paidOnPaperTier: apiLc.paidOnPaperTier || pop.paidOnPaperTier,
           paidOnPaperReason: apiLc.paidOnPaperReason || pop.paidOnPaperReason,
           verifiedDisbursedNaira: apiLc.verifiedDisbursedNaira ?? pop.verifiedDisbursedNaira,
-          mtef: apiLc.mtef || defaultNoMtefStage(fy),
-          billDiff: apiLc.billDiff || {
-            status: 'NO_BILL_DIFF_CYCLE',
-            cycleAvailable: false,
-          },
-          bir: apiLc.bir || { status: 'NO_BIR_REPORT', financialYear: fy },
-          nocopo: apiLc.nocopo || [],
-          govspend: apiLc.govspend || [],
-          matchedVia: apiLc.nocopo?.length
+          mtef,
+          billDiff:
+            apiLc.billDiff && typeof apiLc.billDiff === 'object' && apiLc.billDiff.status
+              ? apiLc.billDiff
+              : {
+                  status: 'NO_BILL_DIFF_CYCLE',
+                  cycleAvailable: false,
+                },
+          bir,
+          nocopo,
+          govspend,
+          matchedVia: nocopo.contracts.length > 0
             ? 'BY_RECORD_ID'
             : ucode
               ? 'BY_PROJECT_CODE'
@@ -833,7 +970,6 @@ export async function loadProjectLifecycleForRecord(target: {
     // Fall through to compact index-level synthesis
   }
 
-  const index = await loadProjectLifecycleIndex();
   if (!index) return null;
 
   const mtef = index.mtefByYear?.[String(fy)] || defaultNoMtefStage(fy);
