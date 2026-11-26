@@ -4477,8 +4477,24 @@ export function buildCbnDebtBriefSpec(input: CbnDebtBriefInput): TabularDossierS
     a.name,
     a.tenureLabel,
     a.context,
-    a.keyAction,
+    a.efccOrScrutinyNote ? `${a.keyAction} | Note: ${a.efccOrScrutinyNote}` : a.keyAction,
   ]);
+
+  const efccRows = input.governors
+    .filter(
+      (g) =>
+        g.efccRecord.status !== 'NO_EFCC_INVESTIGATION' ||
+        g.id === 'cardoso' ||
+        g.id === 'ogwuma'
+    )
+    .map((g) => [
+      `${g.name} (${g.tenureLabel})`,
+      g.efccRecord.badgeLabel,
+      g.efccRecord.period || 'Historical / Pre-2003',
+      g.efccRecord.accusationScope.length > 0
+        ? `${g.efccRecord.legalStatusNote} Scope: ${g.efccRecord.accusationScope.join(' | ')}`
+        : g.efccRecord.legalStatusNote,
+    ]);
 
   const tables: ExportSectionTable[] = [
     {
@@ -4513,11 +4529,23 @@ export function buildCbnDebtBriefSpec(input: CbnDebtBriefInput): TabularDossierS
       ],
       rows: governorRows,
     },
+    {
+      heading: '3. EFCC & Anti-Graft Investigation Records & Scope of Accusations',
+      caption:
+        'Verified EFCC & judicial status of CBN Governors (pre-2003 Founding/Military Governors and Chief J.O. Sanusi had no personal EFCC investigation). Allegations reflect charges/briefings and not convictions unless entered by a court.',
+      columns: [
+        'CBN Governor & Tenure',
+        'EFCC / Anti-Graft Status',
+        'Period',
+        'Legal Status & Scope of Accusations',
+      ],
+      rows: efccRows,
+    },
   ];
 
   if (actingRows.length > 0) {
     tables.push({
-      heading: '3. Acting CBN Governor Interregnums',
+      heading: '4. Acting CBN Governor Interregnums',
       columns: ['Acting Governor', 'Tenure', 'Transition Context', 'Key Policy Action'],
       rows: actingRows,
     });
@@ -4561,7 +4589,7 @@ export function buildCbnDebtBriefSpec(input: CbnDebtBriefInput): TabularDossierS
     tables,
     permalink: input.permalink || buildCanonicalPermalink({ tab: 'cbn' }),
     footnote:
-      'Sources: Central Bank of Nigeria (cbn.gov.ng), Debt Management Office Nigeria (dmo.gov.ng), NBS CPI Bulletins, NDIC Records, IMF Article IV & 2023 Obazee Special Investigation Report.',
+      'Sources: Central Bank of Nigeria (cbn.gov.ng), Debt Management Office Nigeria (dmo.gov.ng), NBS CPI Bulletins, NDIC Records, IMF Article IV, 2023 Obazee Special Investigation Report, and EFCC Court Filings & Official Briefings.',
   };
 }
 

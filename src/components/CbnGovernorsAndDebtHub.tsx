@@ -30,6 +30,7 @@ import {
   CBN_ACTING_GOVERNORS,
   CBN_GOVERNORS,
   type CbnGovernorProfile,
+  type EfccInvestigationStatus,
 } from '../data/cbnGovernors';
 import { HISTORICAL_MACRO_DATA } from '../data/historicalMacroData';
 import {
@@ -54,6 +55,25 @@ type SectionFocus = 'all' | 'debt' | 'governors';
 type EraFilter = 'all' | 'FOURTH_REPUBLIC' | 'FOUNDING_MILITARY';
 type DebtBasisMode = 'handover' | 'raw';
 type DebtChartMode = 'netUsd' | 'extUsd' | 'netNaira' | 'timeline';
+
+function getEfccBadgeStyle(status: EfccInvestigationStatus): {
+  bg: string;
+  color: string;
+  border: string;
+  headingColor: string;
+} {
+  switch (status) {
+    case 'CHARGED_TRIAL_ONGOING':
+      return { bg: '#fef2f2', color: '#991b1b', border: '#fecaca', headingColor: '#7f1d1d' };
+    case 'INVESTIGATED_CLEARED':
+      return { bg: '#ecfdf5', color: '#047857', border: '#a7f3d0', headingColor: '#064e3b' };
+    case 'SCRUTINIZED_NO_EFCC_CHARGE':
+      return { bg: '#fffbeb', color: '#b45309', border: '#fde68a', headingColor: '#78350f' };
+    case 'NO_EFCC_INVESTIGATION':
+    default:
+      return { bg: '#f8fafc', color: '#475569', border: '#cbd5e1', headingColor: '#334155' };
+  }
+}
 
 function fmtNairaT(millions: number | null | undefined, showSign = false): string {
   if (millions === null || millions === undefined || Number.isNaN(millions)) return 'N/A';
@@ -82,6 +102,7 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
 
   const [eraFilter, setEraFilter] = useState<EraFilter>('all');
   const [presidentFilter, setPresidentFilter] = useState<string>('ALL');
+  const [efccOnly, setEfccOnly] = useState<boolean>(false);
   const [sortOrder, setSortOrder] = useState<'newest' | 'chronological'>('newest');
   const [govSearch, setGovSearch] = useState<string>('');
   const [exportNotice, setExportNotice] = useState<string | null>(null);
@@ -169,6 +190,7 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
     const q = govSearch.trim().toLowerCase();
     const list = CBN_GOVERNORS.filter((g) => {
       if (eraFilter !== 'all' && g.era !== eraFilter) return false;
+      if (efccOnly && g.efccRecord.status === 'NO_EFCC_INVESTIGATION') return false;
       if (
         presidentFilter !== 'ALL' &&
         !g.presidentIds.includes(presidentFilter as CbnGovernorProfile['presidentIds'][number])
@@ -183,6 +205,9 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
         ...g.servedUnder,
         ...g.economicManagement,
         ...g.documentedCriticisms,
+        g.efccRecord.badgeLabel,
+        g.efccRecord.legalStatusNote,
+        ...g.efccRecord.accusationScope,
       ]
         .join(' ')
         .toLowerCase();
@@ -191,7 +216,12 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
     return sortOrder === 'newest'
       ? [...list].sort((a, b) => b.order - a.order)
       : [...list].sort((a, b) => a.order - b.order);
-  }, [eraFilter, presidentFilter, govSearch, sortOrder]);
+  }, [eraFilter, efccOnly, presidentFilter, govSearch, sortOrder]);
+
+  const efccRecordCount = useMemo(
+    () => CBN_GOVERNORS.filter((g) => g.efccRecord.status !== 'NO_EFCC_INVESTIGATION').length,
+    []
+  );
 
   const debtTimelineSeries = useMemo(
     () =>
@@ -937,7 +967,10 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                   type="button"
                   onClick={() => {
                     setEraFilter(eKey);
-                    if (eKey === 'FOUNDING_MILITARY') setPresidentFilter('ALL');
+                    if (eKey === 'FOUNDING_MILITARY') {
+                      setPresidentFilter('ALL');
+                      setEfccOnly(false);
+                    }
                   }}
                   style={{
                     padding: '0.32rem 0.65rem',
@@ -952,6 +985,31 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                   {eLabel}
                 </button>
               ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setEfccOnly((prev) => {
+                    const next = !prev;
+                    if (next && eraFilter === 'FOUNDING_MILITARY') setEraFilter('all');
+                    return next;
+                  });
+                }}
+                aria-pressed={efccOnly}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.32rem 0.65rem',
+                  borderRadius: '999px',
+                  border: efccOnly ? '1px solid #991b1b' : '1px solid #fecaca',
+                  backgroundColor: efccOnly ? '#b91c1c' : '#fef2f2',
+                  color: efccOnly ? '#ffffff' : '#991b1b',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                }}
+              >
+                <Scale size={12} /> EFCC / Probe Record ({efccRecordCount})
+              </button>
               {presidentFilter !== 'ALL' && (
                 <button
                   type="button"
@@ -977,7 +1035,7 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                 type="text"
                 value={govSearch}
                 onChange={(e) => setGovSearch(e.target.value)}
-                placeholder="Search governor, AMCON, Ways & Means, SAP..."
+                placeholder="Search governor, EFCC, Securency, Ways & Means..."
                 aria-label="Search CBN Governors archive"
                 style={{
                   width: '100%',
@@ -994,7 +1052,10 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
 
           {/* Governor Cards List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {filteredGovernors.map((gov) => (
+            {filteredGovernors.map((gov) => {
+              const efccStyle = getEfccBadgeStyle(gov.efccRecord.status);
+              const hasInquiryRecord = gov.efccRecord.status !== 'NO_EFCC_INVESTIGATION';
+              return (
               <article
                 key={gov.id}
                 style={{
@@ -1044,6 +1105,18 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                         }}
                       >
                         {gov.era === 'FOURTH_REPUBLIC' ? 'Fourth Republic' : '1958–1999 Era'}
+                      </span>
+                      <span
+                        className="editorial-pill"
+                        style={{
+                          fontSize: '0.66rem',
+                          fontWeight: 700,
+                          backgroundColor: efccStyle.bg,
+                          color: efccStyle.color,
+                          borderColor: efccStyle.border,
+                        }}
+                      >
+                        {gov.efccRecord.badgeLabel}
                       </span>
                       <span className="font-mono" style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: 600 }}>
                         {gov.tenureLabel}
@@ -1152,6 +1225,98 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                   </div>
                 </div>
 
+                {/* EFCC & Anti-Graft Investigation Record */}
+                {hasInquiryRecord ? (
+                  <div
+                    style={{
+                      backgroundColor: efccStyle.bg,
+                      border: `1px solid ${efccStyle.border}`,
+                      borderRadius: '9px',
+                      padding: '0.8rem 0.95rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.45rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.4rem' }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.4rem',
+                          fontSize: '0.74rem',
+                          fontWeight: 800,
+                          color: efccStyle.color,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        <Scale size={14} /> EFCC &amp; Anti-Graft Investigation Record
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', flexWrap: 'wrap' }}>
+                        {gov.efccRecord.period && (
+                          <span className="font-mono" style={{ fontSize: '0.67rem', fontWeight: 700, color: efccStyle.headingColor }}>
+                            {gov.efccRecord.period}
+                          </span>
+                        )}
+                        <span
+                          className="editorial-pill"
+                          style={{
+                            fontSize: '0.66rem',
+                            fontWeight: 700,
+                            backgroundColor: '#ffffff',
+                            color: efccStyle.color,
+                            borderColor: efccStyle.border,
+                          }}
+                        >
+                          {gov.efccRecord.badgeLabel}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p style={{ margin: 0, fontSize: '0.76rem', color: efccStyle.headingColor, lineHeight: 1.48, fontWeight: 500 }}>
+                      {gov.efccRecord.legalStatusNote}
+                    </p>
+
+                    {gov.efccRecord.accusationScope.length > 0 && (
+                      <div style={{ marginTop: '0.1rem' }}>
+                        <div style={{ fontSize: '0.71rem', fontWeight: 800, color: efccStyle.color, textTransform: 'uppercase', marginBottom: '0.28rem' }}>
+                          Scope of Accusations / Inquiry
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: '1.1rem', display: 'flex', flexDirection: 'column', gap: '0.32rem', fontSize: '0.75rem', color: efccStyle.headingColor, lineHeight: 1.48 }}>
+                          {gov.efccRecord.accusationScope.map((scopePt, idx) => (
+                            <li key={idx}>{scopePt}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    <div style={{ fontSize: '0.68rem', color: efccStyle.color, borderTop: `1px dashed ${efccStyle.border}`, paddingTop: '0.35rem', marginTop: '0.1rem' }}>
+                      <strong>Attribution:</strong> {gov.efccRecord.sources.join(' · ')}. Allegations reflect formal charges or official briefings and do not constitute criminal convictions unless entered by a court of competent jurisdiction.
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      backgroundColor: '#f8fafc',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '8px',
+                      padding: '0.55rem 0.8rem',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.5rem',
+                      fontSize: '0.73rem',
+                      color: 'var(--text-secondary)',
+                      lineHeight: 1.45,
+                    }}
+                  >
+                    <Scale size={14} color="#64748b" style={{ flexShrink: 0, marginTop: '0.15rem' }} />
+                    <div>
+                      <strong style={{ color: '#334155' }}>{gov.efccRecord.badgeLabel}:</strong>{' '}
+                      {gov.efccRecord.legalStatusNote}
+                    </div>
+                  </div>
+                )}
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.69rem', color: 'var(--text-muted)' }}>
                   <span className="font-mono">Sources: {gov.sources.join(' · ')}</span>
                   {gov.startYear >= 1999 && onSelectYear && (
@@ -1166,7 +1331,8 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                   )}
                 </div>
               </article>
-            ))}
+              );
+            })}
 
             {filteredGovernors.length === 0 && (
               <div style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
@@ -1189,6 +1355,11 @@ export const CbnGovernorsAndDebtHub: React.FC<CbnGovernorsAndDebtHubProps> = ({
                   </div>
                   <p style={{ fontSize: '0.73rem', color: 'var(--text-secondary)', margin: '0.3rem 0 0.25rem' }}>{act.context}</p>
                   <p style={{ fontSize: '0.73rem', color: 'var(--text-primary)', margin: 0 }}><strong>Key Action:</strong> {act.keyAction}</p>
+                  {act.efccOrScrutinyNote && (
+                    <p style={{ fontSize: '0.71rem', color: '#475569', margin: '0.3rem 0 0' }}>
+                      <strong>Anti-Graft / Review Note:</strong> {act.efccOrScrutinyNote}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

@@ -2,10 +2,26 @@
  * Central Bank of Nigeria (CBN) Governors Historical & Fourth Republic Ledger (1958–2026).
  *
  * Dates and substantive tenures mirror official CBN Past Governors API (`/api/GetPastGovernors`)
- * and current Governor records. Management highlights and documented criticisms attribute findings
- * neutrally to official CBN Annual Reports, NDIC Liquidation Records, DMO Public Debt Bulletins,
- * IMF Article IV consultations, National Assembly probes, and the 2023 Jim Obazee Special Investigation.
+ * and current Governor records. Management highlights, documented criticisms, and EFCC / anti-graft
+ * records attribute findings neutrally to official CBN Annual Reports, NDIC Liquidation Records,
+ * DMO Public Debt Bulletins, IMF Article IV consultations, EFCC court filings & press briefings,
+ * Federal High Court rulings, and the 2023 Jim Obazee Special Investigation.
  */
+
+export type EfccInvestigationStatus =
+  | 'CHARGED_TRIAL_ONGOING'
+  | 'INVESTIGATED_CLEARED'
+  | 'SCRUTINIZED_NO_EFCC_CHARGE'
+  | 'NO_EFCC_INVESTIGATION';
+
+export interface CbnEfccRecord {
+  status: EfccInvestigationStatus;
+  badgeLabel: string;
+  period?: string;
+  legalStatusNote: string;
+  accusationScope: string[];
+  sources: string[];
+}
 
 export interface CbnGovernorProfile {
   id: string;
@@ -32,6 +48,7 @@ export interface CbnGovernorProfile {
   };
   economicManagement: string[];
   documentedCriticisms: string[];
+  efccRecord: CbnEfccRecord;
   sources: string[];
 }
 
@@ -41,6 +58,7 @@ export interface CbnActingGovernorNote {
   tenureLabel: string;
   context: string;
   keyAction: string;
+  efccOrScrutinyNote?: string;
 }
 
 export const CBN_ACTING_GOVERNORS: CbnActingGovernorNote[] = [
@@ -57,6 +75,7 @@ export const CBN_ACTING_GOVERNORS: CbnActingGovernorNote[] = [
     tenureLabel: 'Jun 9, 2023 – Sep 26, 2023',
     context: 'Deputy Governor (Operations) appointed Acting Governor upon the suspension of Godwin Emefiele.',
     keyAction: 'Executed the landmark June 14, 2023 FX window unification ("I&E" float), eliminating the legacy multi-rate spread from ~₦461/$ toward market clearing (~₦770/$).',
+    efccOrScrutinyNote: 'Subjected to administrative/security scrutiny and lifestyle review alongside other post-Emefiele CBN executives during the 2023 Special Investigation; exited upon Cardoso’s confirmation in Sep 2023 with no EFCC criminal conviction.',
   },
 ];
 
@@ -94,6 +113,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Banking supervision framework under the 1958 Ordinance lacked rapid failure-resolution tools for thinly capitalized indigenous banks.',
       'Key reserve assets remained concentrated in London Sterling balances rather than diversified sovereign instruments.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served 40 years before the EFCC was established in 2003; no EFCC investigation recorded.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria History Archive', 'CBN Act 1958 & Annual Reports (1959–1963)'],
   },
   {
@@ -129,6 +155,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Early reliance on administrative import-control quotas began fostering secondary FX rationing friction.',
       'Credit allocation remained heavily skewed toward foreign-owned trading houses over indigenous manufacturers.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served prior to the EFCC’s establishment (2003); no EFCC investigation recorded.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'CBN Monetary Policy Review Series'],
   },
   {
@@ -164,6 +197,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Overvalued fixed Naira exchange peg encouraged import dependency ("Dutch Disease") and undercut traditional non-oil agricultural exports.',
       'Rigid interest-rate caps produced negative real deposit rates, discouraging private domestic savings.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served prior to the EFCC’s establishment (2003); no EFCC investigation recorded.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'Nigeria Historical Macroeconomic Statistics (CBN Statistical Bulletin)'],
   },
   {
@@ -199,6 +239,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Heavy reliance on direct administrative credit ceilings and fixed low interest rates suppressed bond market price discovery.',
       'Import-substitution credit quotas suffered leakage into trading and speculative imports.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served prior to the EFCC’s establishment (2003); no EFCC investigation recorded.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', '1976 Financial System Review Committee Report'],
   },
   {
@@ -234,6 +281,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Delayed FX adjustment generated multi-billion-dollar unverified import trade arrears ("Paris/London Club uninsured bills"), culminating in the April 1982 Economic Stabilization crisis.',
       'Credit expansion to state agencies amplified Second Republic fiscal vulnerabilities.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served prior to the EFCC’s establishment (2003); no EFCC investigation recorded.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'NDIC Institutional History & Shagari-Era Economic Stabilization Records'],
   },
   {
@@ -269,6 +323,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'The 1994 Okigbo Panel Investigation heavily faulted the CBN and military presidency over $12.4 billion in Gulf War oil windfalls routed through opaque "Dedicated Accounts" outside normal budgetary oversight.',
       'Persistent fiscal deficit monetization fueled runaway inflation exceeding 57% by 1993 and wiped out middle-class Naira purchasing power.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'Pre-EFCC Era (No EFCC Investigation)',
+      legalStatusNote: 'Served before the EFCC was established in 2003; his tenure was examined by the 1994 Okigbo Panel (a federal inquiry into $12.4B Gulf War oil windfall dedicated accounts), not the EFCC.',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive', '1994 Okigbo Panel Report Summary'],
+    },
     sources: ['Central Bank of Nigeria Archive', '1994 Pius Okigbo Panel Report on CBN Reorganization', 'NDIC Annual Reports'],
   },
   {
@@ -304,6 +365,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Delayed resolution of distressed banks between 1994 and 1997 allowed insider non-performing loans to compound before the 1998 liquidations.',
       'Foreign reserves fell sharply during the 1998–1999 pre-transition spending period, leaving thin external buffers for the incoming Fourth Republic.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'No Personal EFCC Investigation (Pre-EFCC Era)',
+      legalStatusNote: 'Served before the EFCC was established (2003) and was never personally investigated or charged. Historically, fraudster Emmanuel Nwude impersonated Ogwuma during the 1995–1998 $242M Banco Noroeste scam, which the EFCC later prosecuted against Nwude and co-conspirators.',
+      accusationScope: [],
+      sources: ['EFCC Historical Prosecution Archives (Banco Noroeste Case)', 'Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'NDIC Failed Banks Resolution Dossier (1994–1999)', 'CBN Statistical Bulletin'],
   },
   {
@@ -339,6 +407,13 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Could not contain Naira depreciation (₦92/$ -> ₦133/$) or prevent inflation returning to 14%–15% by 2003–2004 amid election-cycle fiscal expansion.',
       'High real lending spreads (>21% prime/max) persisted throughout his tenure, starving SMEs and agriculture of long-term credit.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'No EFCC Investigation Recorded',
+      legalStatusNote: 'No personal EFCC investigation, indictment, or prosecution recorded during or after his 1999–2004 tenure (the EFCC was established in 2003, near the end of his term).',
+      accusationScope: [],
+      sources: ['Central Bank of Nigeria Archive'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'CBN Annual Reports (1999–2004)', 'IMF Nigeria Article IV Reports'],
   },
   {
@@ -374,6 +449,16 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Sudden August 2007 Naira redenomination ("₦100 = ₦1") proposal was abruptly suspended by President Yar\'Adua over lack of cabinet coordination.',
       'Late 2008–2009 defense of FX reserves failed to prevent a sharp Naira drop (₦118/$ -> ₦149/$) and sudden credit freeze when oil fell from $147/bbl to $40/bbl.',
     ],
+    efccRecord: {
+      status: 'INVESTIGATED_CLEARED',
+      badgeLabel: 'EFCC Investigated (2013) — Officially Cleared (2015)',
+      period: 'Jan 2013 – Mar 2015',
+      legalStatusNote: 'Invited and interrogated by the EFCC in January 2013; never charged. In March 2015, then-EFCC Chairman Ibrahim Lamorde publicly cleared and exonerated Soludo, confirming investigations did not incriminate him and he had no case to answer.',
+      accusationScope: [
+        'Polymer Banknote Bribery Inquiry (2006–2008 contracts): Investigated allegations that Australian banknote manufacturer Securency Pty Ltd paid bribes to Nigerian officials to secure polymer Naira printing and supply contracts awarded during his CBN tenure (joint inquiry with international partners including UK authorities).',
+      ],
+      sources: ['EFCC Official Press Briefing (Chairman Ibrahim Lamorde, March 2015)', 'Premium Times', 'Vanguard'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'CBN Act 2007 & Banking Consolidation Reports', '2009 CBN/NDIC Special Examination Findings'],
   },
   {
@@ -409,6 +494,17 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Critics argued CBN-funded quasi-fiscal schemes (`₦500B+` power/aviation/SME interventions) blurred fiscal-monetary boundaries ahead of later excesses.',
       'Governance standoff with the Presidency — following his NASS/public whistleblowing over unremitted $20B NNPC oil revenues (PwC audit later traced ~$1.48B+ refund due) — triggered his February 2014 suspension over alleged CBN procurement/intervention breaches.',
     ],
+    efccRecord: {
+      status: 'SCRUTINIZED_NO_EFCC_CHARGE',
+      badgeLabel: 'Post-Tenure Scrutiny & Unlawful Detention Ruling — No EFCC Charge',
+      period: '2014 – 2015',
+      legalStatusNote: 'Suspended Feb 20, 2014 after a Financial Reporting Council of Nigeria (FRCN) report shortly after he publicly alleged ~$20B in unremitted NNPC oil revenues. A Federal High Court ruled his brief post-suspension detention and passport seizure unlawful in April 2014. Never criminally charged or convicted by the EFCC.',
+      accusationScope: [
+        'FRCN Governance Allegations (2014): Cited alleged financial recklessness, procurement irregularities, and unauthorized intervention spending in the FRCN report that preceded his suspension.',
+        'ONSA Arms Probe & Bank Bailout Petitions (2015): Media reports cited potential EFCC questioning over CBN disbursements to the Office of the National Security Adviser ($2.2B arms probe), alongside civil society petitions regarding the 2009 commercial bank bailouts — none resulted in EFCC criminal charges.',
+      ],
+      sources: ['Federal High Court Ruling (April 2014)', 'FRCN Report (2014)', 'Premium Times / Vanguard'],
+    },
     sources: ['Central Bank of Nigeria Archive', 'Financial Reporting Council (FRC) & CBN 2013–14 Briefings', 'IMF Nigeria Article IV'],
   },
   {
@@ -445,6 +541,22 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       'Chaotic 2022–2023 Naira Redesign: Confiscatory cash-swap deadlines caused severe nationwide physical cash shortages that contracted Q1 2023 informal GDP.',
       'Obazee Special Investigator Findings (Dec 2023): Suspended June 2023; Jim Obazee\'s forensic audit documented unauthorized foreign accounts, unapproved security/procurement expenditures, illegal Anchor Borrowers disbursements, and ongoing EFCC/Federal High Court prosecutions.',
     ],
+    efccRecord: {
+      status: 'CHARGED_TRIAL_ONGOING',
+      badgeLabel: 'EFCC Arraigned — Trials Ongoing (Pleaded Not Guilty)',
+      period: 'Oct 2023 – Present',
+      legalStatusNote: 'Suspended June 9, 2023; initially detained by DSS and transferred to EFCC custody in October 2023. Arraigned on multi-count charges in Abuja and Lagos courts; pleaded not guilty across all counts. Criminal trials remain ongoing with no criminal conviction entered (separate civil/final forfeiture orders were entered on linked assets, including $2.045M and connected properties).',
+      accusationScope: [
+        'FCT High Court, Abuja (20-count amended charge, Justice Hamza Muazu): Alleged procurement fraud, criminal breach of trust, forgery, conspiracy, conferring corrupt advantage on companies linked to family/associates, and obtaining $6.23 million from the CBN vault by false pretence purportedly for 2023 foreign election observers (defense filed a no-case submission).',
+        'Lagos Special Offences Court, Ikeja (19-count amended charge with co-defendant Henry Omoile, Justice Rahman Oshodi): Alleged abuse of office, accepting gratification/kickbacks, fraudulent receipt of property, and corrupt FX allocation practices involving $4.5 billion and ₦2.8 billion.',
+        'FCT High Court, Maitama, Abuja (Justice Maryann Anenih): Charges alleging disobedience to the direction of law and illegal acts causing public injury over the late-2022 Naira redesign/swap allegedly executed without mandatory Presidential and CBN Board approvals, alongside alleged unauthorized withdrawals (including ₦124.8 billion) from the Consolidated Revenue Fund.',
+      ],
+      sources: [
+        'EFCC Court Filings (FCT High Court Abuja & Lagos Special Offences Court)',
+        'Jim Obazee Special Investigator Report (Dec 2023)',
+        'Premium Times / Punch / Vanguard',
+      ],
+    },
     sources: [
       'DMO Nigeria June 30, 2023 Debt Report (₦22.71T Ways & Means)',
       'Jim Obazee Special Investigator Report on the CBN (Dec 2023)',
@@ -485,6 +597,14 @@ export const CBN_GOVERNORS: CbnGovernorProfile[] = [
       '2023–2024 Transition Volatility & Cost-of-Living Crisis: Rapid FX unification without initial reserve buffers saw the Naira lose >60% in 2023–2024, triggering corporate FX losses, multinational exits, and >31% headline inflation.',
       'Nominal Debt Revaluation Surge: Floating the currency from ₦461/₦770 to ~₦1,379–₦1,550/$ multiplied the Naira carrying value of Nigeria’s inherited external debt stock by over ₦26 trillion even before net new foreign loans.',
     ],
+    efccRecord: {
+      status: 'NO_EFCC_INVESTIGATION',
+      badgeLabel: 'No EFCC Investigation (CBN Partnered With EFCC)',
+      period: '2023 – Present',
+      legalStatusNote: 'Not investigated or charged by the EFCC. Instead, following a forensic Deloitte audit flagging ~$2.4B in allegedly invalid/unlawful legacy FX forward claims out of the ~$7B backlog, the Cardoso-led CBN partnered with the EFCC to investigate and prosecute implicated banks, firms, and individuals.',
+      accusationScope: [],
+      sources: ['CBN Press Briefings (2024)', 'Deloitte FX Backlog Forensic Audit Summary'],
+    },
     sources: [
       'Central Bank of Nigeria MPC Communiques (2023–2026)',
       'DMO Nigeria June 30, 2026 Debt Stock Report',
