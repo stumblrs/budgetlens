@@ -173,6 +173,12 @@ export function App() {
     year: initialUrlState.year ?? selectedYear,
   });
 
+  const hasLoadedEvidenceRef = useRef(false);
+  const lastEvidenceSyncRef = useRef(lastSyncedAt);
+  const hasLoadedLineagesRef = useRef(false);
+  const lastLineagesSyncRef = useRef(lastSyncedAt);
+  const lastProjectsLoadKeyRef = useRef('');
+
   const [evidenceItems, setEvidenceItems] = useState<EvidenceItem[]>([]);
   const [compoundProjects, setCompoundProjects] = useState<CompoundFlaggedProject[]>([]);
   const [duplicateClusters, setDuplicateClusters] = useState<DuplicateCluster[]>([]);
@@ -183,21 +189,34 @@ export function App() {
   const [projectSearchQuery, setProjectSearchQuery] = useState(initialUrlState.q);
   const [selectedRuleId, setSelectedRuleId] = useState<string | null>(null);
 
-  // Load 28-Year Evidence Engine v3.0 Cross-Ledger Index once
+  const isForensicTab =
+    activeTab === 'overview' ||
+    activeTab === 'projects' ||
+    activeTab === 'evidence' ||
+    activeTab === 'duplicates' ||
+    activeTab === 'forensics' ||
+    activeTab === 'reports';
+
+  // Lazy-load 28-Year Evidence Engine v3.0 Cross-Ledger Index only for tabs that consume it
   useEffect(() => {
+    if (!isForensicTab) return;
+    if (hasLoadedEvidenceRef.current && lastEvidenceSyncRef.current === lastSyncedAt) return;
     let active = true;
+    lastEvidenceSyncRef.current = lastSyncedAt;
     loadEvidenceEngineAllYears().then((data) => {
       if (active && data) {
+        hasLoadedEvidenceRef.current = true;
         setEvidenceAllYears(data);
       }
     });
     return () => {
       active = false;
     };
-  }, [lastSyncedAt]);
+  }, [isForensicTab, lastSyncedAt]);
 
-  // Off-main-thread Web Worker computation of Rule Engine v3.0 & Duplicate Clusters
+  // Off-main-thread Web Worker computation of Rule Engine v3.0 & Duplicate Clusters (lazy per tab)
   useEffect(() => {
+    if (!isForensicTab) return;
     if (!extractedProjects || extractedProjects.length === 0) {
       setEvidenceItems([]);
       setCompoundProjects([]);
@@ -231,14 +250,26 @@ export function App() {
       });
 
     return () => controller.abort();
-  }, [extractedProjects, selectedYear, evidenceAllYears]);
+  }, [extractedProjects, selectedYear, evidenceAllYears, isForensicTab]);
 
+  // Lazy-load recurring lineages only when the Recurring tab is active
   useEffect(() => {
-    fetch(apiUrl('/api/v1/forensics/lineages?limit=100'), { cache: 'no-store' })
+    if (activeTab !== 'recurring') return;
+    if (hasLoadedLineagesRef.current && lastLineagesSyncRef.current === lastSyncedAt) return;
+    let active = true;
+    lastLineagesSyncRef.current = lastSyncedAt;
+    fetch(apiUrl('/api/v1/forensics/lineages?limit=100'), lastSyncedAt ? { cache: 'no-store' } : undefined)
       .then((res) => (res.ok ? res.json() : null))
-      .then((data: any) => setRecurringLineages(Array.isArray(data) ? data : (data?.lineages || [])))
+      .then((data: any) => {
+        if (!active) return;
+        hasLoadedLineagesRef.current = true;
+        setRecurringLineages(Array.isArray(data) ? data : (data?.lineages || []));
+      })
       .catch((err) => console.error('Failed to load recurring lineages:', err));
-  }, [lastSyncedAt]);
+    return () => {
+      active = false;
+    };
+  }, [activeTab, lastSyncedAt]);
 
   useEffect(() => {
     const force = Boolean(lastSyncedAt);
@@ -252,11 +283,27 @@ export function App() {
       })
       .catch((err) => console.error(`Failed to load ${selectedYear} stats:`, err));
 
+    const priorYear = selectedYear - 1;
+    fetchDataset<any>(`${priorYear}/statistics`, force)
+      .then((data) => setPriorAmount(data?.officialTotalBudget || data?.totalCapitalAmount || data?.totalAmount))
+      .catch(() => setPriorAmount(undefined));
+
+    if (activeTab === 'record' || activeTab === 'document') {
+      return;
+    }
+
+    const loadKey = `${selectedYear}|${lastSyncedAt}`;
+    if (lastProjectsLoadKeyRef.current === loadKey) {
+      return;
+    }
+    lastProjectsLoadKeyRef.current = loadKey;
+
+    const reqInit = force ? { cache: 'no-store' as const } : undefined;
     Promise.all([
-      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&limit=150`), { cache: 'no-store' })
+      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&limit=150`), reqInit)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
-      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&flagged_only=1&limit=100`), { cache: 'no-store' })
+      fetch(apiUrl(`/api/v1/projects?year=${selectedYear}&flagged_only=1&limit=100`), reqInit)
         .then((res) => (res.ok ? res.json() : null))
         .catch(() => null),
     ])
@@ -274,12 +321,7 @@ export function App() {
         console.error(`Failed to load ${selectedYear} projects:`, err);
         setExtractedProjectsYear(selectedYear);
       });
-
-    const priorYear = selectedYear - 1;
-    fetchDataset<any>(`${priorYear}/statistics`, force)
-      .then((data) => setPriorAmount(data?.officialTotalBudget || data?.totalCapitalAmount || data?.totalAmount))
-      .catch(() => setPriorAmount(undefined));
-  }, [selectedYear, lastSyncedAt]);
+  }, [selectedYear, lastSyncedAt, activeTab]);
 
   // Global Ctrl+K / Cmd+K (search) and Ctrl+B / Cmd+B (sidebar) shortcuts
   useEffect(() => {

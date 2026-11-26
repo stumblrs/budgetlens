@@ -146,7 +146,7 @@ export const OverviewCrossLedgerWidget: React.FC<OverviewCrossLedgerWidgetProps>
   useEffect(() => {
     let active = true;
 
-    fetch(datasetUrl('/datasets/bill_act_diffs/index.json'), { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/bill_act_diffs/index.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (!active || !json?.cycles) return;
@@ -158,7 +158,7 @@ export const OverviewCrossLedgerWidget: React.FC<OverviewCrossLedgerWidgetProps>
       })
       .catch(() => {});
 
-    fetch(datasetUrl('/datasets/govspend_forensics.json'), { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/govspend_forensics.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (!active || !json?.decemberRush?.yearlyRush) return;
@@ -170,7 +170,7 @@ export const OverviewCrossLedgerWidget: React.FC<OverviewCrossLedgerWidgetProps>
       })
       .catch(() => {});
 
-    fetch(datasetUrl('/datasets/macro_credibility_tracker.json'), { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/macro_credibility_tracker.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (!active || !json?.yearlySeries) return;
@@ -182,14 +182,14 @@ export const OverviewCrossLedgerWidget: React.FC<OverviewCrossLedgerWidgetProps>
       })
       .catch(() => {});
 
-    fetch(datasetUrl('/datasets/forensic_sweep_1999_2026.json'), { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/forensic_sweep_1999_2026.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((json: ForensicSweepSummaryMini | null) => {
         if (active && json) setSweepMini(json);
       })
       .catch(() => {});
 
-    fetch(datasetUrl('/datasets/oaugf_audit_index.json'), { cache: 'no-store' })
+    fetch(datasetUrl('/datasets/oaugf_audit_index.json'))
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (!active || !json?.documents) return;

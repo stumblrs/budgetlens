@@ -136,14 +136,14 @@ class BudgetDatabaseEngine {
   private availableYears: number[] = [];
   private lastRegistryGeneratedAt: string = '';
   private lastGrandTotalProjects: number = -1;
-  private loadingYears: Set<number> = new Set();
+  private loadingYearPromises: Map<number, Promise<BudgetRecord[]>> = new Map();
 
   public async initialize(preferredYear?: number): Promise<void> {
     await Promise.all([
       this.fetchRegistry(),
       this.loadSummary(),
-      this.loadStatisticalForensics(),
     ]);
+    void this.loadStatisticalForensics();
 
     const years = this.discoverAvailableYears();
     this.availableYears = years;
@@ -347,28 +347,31 @@ class BudgetDatabaseEngine {
       return this.recordsByYear.get(year)!;
     }
 
-    if (this.loadingYears.has(year)) {
-      return this.recordsByYear.get(year) || [];
+    if (!forceRefresh && this.loadingYearPromises.has(year)) {
+      return this.loadingYearPromises.get(year)!;
     }
 
-    this.loadingYears.add(year);
-    try {
-      const data = await fetchApiJson<{ items?: BudgetRecord[] } | BudgetRecord[]>(
-        apiUrl(`/api/v1/projects?year=${year}&format=record&limit=200`),
-        forceRefresh ? { cache: 'no-store' } : undefined
-      );
-      const records = Array.isArray(data) ? data : (data?.items || []);
-      if (records.length > 0) {
-        this.recordsByYear.set(year, records);
-        return records;
+    const promise = (async () => {
+      try {
+        const data = await fetchApiJson<{ items?: BudgetRecord[] } | BudgetRecord[]>(
+          apiUrl(`/api/v1/projects?year=${year}&format=record&limit=200`),
+          forceRefresh ? { cache: 'no-store' } : undefined
+        );
+        const records = Array.isArray(data) ? data : (data?.items || []);
+        if (records.length > 0) {
+          this.recordsByYear.set(year, records);
+          return records;
+        }
+      } catch (err) {
+        console.error(`Failed to load database records for year ${year}:`, err);
+      } finally {
+        this.loadingYearPromises.delete(year);
       }
-    } catch (err) {
-      console.error(`Failed to load database records for year ${year}:`, err);
-    } finally {
-      this.loadingYears.delete(year);
-    }
+      return this.recordsByYear.get(year) || [];
+    })();
 
-    return this.recordsByYear.get(year) || [];
+    this.loadingYearPromises.set(year, promise);
+    return promise;
   }
 
   // Feature Query 1: Sector & MDA Distribution

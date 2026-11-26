@@ -24,6 +24,7 @@ import {
   type TabularDossierSpec,
 } from '../utils/documentExporter';
 import { buildCanonicalPermalink } from '../utils/urlState';
+import { apiUrl } from '../services/apiClient';
 
 export type ProjectQuickFilter =
   | 'all'
@@ -110,6 +111,21 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
   const [projectSort, setProjectSort] = useState<ProjectSortOption>('amount-desc');
   const [projectPage, setProjectPage] = useState(1);
   const [exportingFormat, setExportingFormat] = useState<'pdf' | 'docx' | null>(null);
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery.trim());
+  const [serverRows, setServerRows] = useState<any[] | null>(null);
+  const [serverTotalMatches, setServerTotalMatches] = useState<number | null>(null);
+  const [serverTotalAmountNaira, setServerTotalAmountNaira] = useState<number | null>(null);
+  const [serverLoading, setServerLoading] = useState(false);
+
+  const useServerPagination =
+    (quickFilter === 'all' || quickFilter === 'flagged') && projectSort !== 'risk-desc';
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     setQuickFilter((prev) => (prev === 'aiEnriched' ? 'all' : prev));
@@ -118,6 +134,67 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
   useEffect(() => {
     setProjectPage(1);
   }, [searchQuery, projectSort, quickFilter, financialYear]);
+
+  useEffect(() => {
+    if (!useServerPagination) {
+      setServerRows(null);
+      setServerTotalMatches(null);
+      setServerTotalAmountNaira(null);
+      setServerLoading(false);
+      return;
+    }
+
+    let active = true;
+    const ctrl = new AbortController();
+    setServerLoading(true);
+
+    const apiSort =
+      projectSort === 'amount-asc'
+        ? 'amount_asc'
+        : projectSort === 'page-asc'
+          ? 'page_asc'
+          : 'amount_desc';
+    const qs = new URLSearchParams({
+      year: String(financialYear),
+      limit: String(PROJECTS_PER_PAGE),
+      offset: String((projectPage - 1) * PROJECTS_PER_PAGE),
+      sort: apiSort,
+    });
+    if (quickFilter === 'flagged') qs.set('flagged_only', '1');
+    if (debouncedSearch) qs.set('q', debouncedSearch);
+
+    fetch(apiUrl(`/api/v1/projects?${qs.toString()}`), { signal: ctrl.signal })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!active) return;
+        if (data?.ok && Array.isArray(data.items)) {
+          setServerRows(data.items);
+          setServerTotalMatches(
+            typeof data.totalMatches === 'number' ? data.totalMatches : data.items.length
+          );
+          setServerTotalAmountNaira(
+            typeof data.totalAmountNaira === 'number' ? data.totalAmountNaira : null
+          );
+        } else {
+          setServerRows(null);
+          setServerTotalMatches(null);
+          setServerTotalAmountNaira(null);
+        }
+        setServerLoading(false);
+      })
+      .catch((err) => {
+        if (!active || err?.name === 'AbortError') return;
+        setServerRows(null);
+        setServerTotalMatches(null);
+        setServerTotalAmountNaira(null);
+        setServerLoading(false);
+      });
+
+    return () => {
+      active = false;
+      ctrl.abort();
+    };
+  }, [useServerPagination, financialYear, projectPage, projectSort, quickFilter, debouncedSearch]);
 
   const compoundLookup = useMemo(
     () => buildCompoundProjectLookup(compoundProjects),
@@ -266,39 +343,55 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
     };
   }, [filteredRows]);
 
-  const totalProjectPages = Math.max(1, Math.ceil(filteredRows.length / PROJECTS_PER_PAGE));
-  const paginatedRows = filteredRows.slice(
-    (projectPage - 1) * PROJECTS_PER_PAGE,
-    projectPage * PROJECTS_PER_PAGE
-  );
+  const serverEnrichedRows = useMemo(() => {
+    if (!serverRows) return [];
+    return serverRows.map((p) => ({
+      project: p,
+      compound: findCompoundForProject(compoundLookup, financialYear, p),
+      hasAi: isValidGemmaReview(p?.gemmaReview),
+    }));
+  }, [serverRows, compoundLookup, financialYear]);
+
+  const isServerActive = useServerPagination && serverRows !== null;
+  const totalMatchingCount = isServerActive
+    ? (serverTotalMatches ?? serverEnrichedRows.length)
+    : filteredRows.length;
+  const totalDisplayAmountNaira = isServerActive
+    ? (serverTotalAmountNaira ??
+      serverEnrichedRows.reduce((acc, r) => acc + Number(r.project.amount || 0), 0))
+    : filteredSummary.totalAmountNaira;
+  const totalProjectPages = Math.max(1, Math.ceil(totalMatchingCount / PROJECTS_PER_PAGE));
+  const paginatedRows = isServerActive
+    ? serverEnrichedRows
+    : filteredRows.slice((projectPage - 1) * PROJECTS_PER_PAGE, projectPage * PROJECTS_PER_PAGE);
 
   const handleExportFiltered = async (format: 'pdf' | 'docx') => {
     if (exportingFormat) return;
     setExportingFormat(format);
     try {
-      const topRows = filteredRows.slice(0, 80);
+      const topRows = (isServerActive ? serverEnrichedRows : filteredRows).slice(0, 80);
       const spec: TabularDossierSpec = {
         filenameBase: `BudgetLens_Capital_Projects_${quickFilter}_FY${financialYear}`,
         eyebrow: `BUDGETLENS CAPITAL PROJECTS WORKBENCH | FY ${financialYear}`,
         title: `Filtered Capital Projects Schedule (FY ${financialYear})`,
-        subtitle: `Filter: ${FILTER_LABELS[quickFilter]}${searchQuery.trim() ? ` | Query: "${searchQuery.trim()}"` : ''} | Matching Rows: ${filteredRows.length.toLocaleString('en-US')}`,
+        subtitle: `Filter: ${FILTER_LABELS[quickFilter]}${searchQuery.trim() ? ` | Query: "${searchQuery.trim()}"` : ''} | Matching Rows: ${totalMatchingCount.toLocaleString('en-US')}`,
         orientation: 'landscape',
         metadata: [
           { label: 'Fiscal Year', value: `FY ${financialYear}` },
           { label: 'Active Filter', value: FILTER_LABELS[quickFilter] },
           { label: 'Search Query', value: searchQuery.trim() || 'None (All Matching)' },
-          { label: 'Matching Total', value: formatNairaCompact(filteredSummary.totalAmountNaira) },
+          { label: 'Matching Total', value: formatNairaCompact(totalDisplayAmountNaira) },
         ],
         kpis: [
           {
             label: 'Matching Line Items',
-            value: filteredRows.length.toLocaleString('en-US'),
-            subtext: `of ${projects.length.toLocaleString('en-US')} FY ${financialYear} items`,
+            value: totalMatchingCount.toLocaleString('en-US'),
+            subtext: `FY ${financialYear} matching records`,
           },
           {
             label: 'Filtered Enacted Value',
-            value: formatNairaCompact(filteredSummary.totalAmountNaira),
-            subtext: formatNairaExact(filteredSummary.totalAmountNaira),
+            value: formatNairaCompact(totalDisplayAmountNaira),
+            subtext: formatNairaExact(totalDisplayAmountNaira),
           },
           {
             label: 'Evidence Engine v3.0 Flagged',
@@ -314,7 +407,7 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
         narrative: `Filtered capital schedule export combining verbatim FY ${financialYear} Federal Appropriation Act line items with Evidence Engine v3.0 compound risk scores (0–100) and cross-ledger accountability badges (Paid-on-Paper, National Assembly Bill-vs-Act Insertion, OAuGF MDA Query History, and Zombie Recurring Lineage).`,
         tables: [
           {
-            heading: `Top ${topRows.length} Matching Capital Line Items (${filteredRows.length.toLocaleString('en-US')} total matches)`,
+            heading: `Top ${topRows.length} Matching Capital Line Items (${totalMatchingCount.toLocaleString('en-US')} total matches)`,
             columns: [
               'Code / Page',
               'Verbatim Project Title',
@@ -434,6 +527,18 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
                 Scoring risk rules...
               </span>
             )}
+            {serverLoading && (
+              <span
+                className="editorial-pill font-mono"
+                style={{
+                  backgroundColor: '#f1f5f9',
+                  color: '#334155',
+                  borderColor: '#cbd5e1',
+                }}
+              >
+                Loading records...
+              </span>
+            )}
             {filterCounts.aiEnriched > 0 && (
               <span
                 className="editorial-pill font-mono"
@@ -450,7 +555,7 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
             )}
           </div>
           <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0.25rem 0 0' }}>
-            Searchable catalog of {projects.length.toLocaleString('en-US')} official capital line items
+            Searchable catalog of {(isServerActive ? totalMatchingCount : projects.length).toLocaleString('en-US')} official capital line items
             joined with Evidence Engine v3.0 compound risk scores &amp; cross-ledger signals
           </p>
         </div>
@@ -458,7 +563,7 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
         <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <button
             type="button"
-            disabled={exportingFormat !== null || filteredRows.length === 0}
+            disabled={exportingFormat !== null || paginatedRows.length === 0}
             onClick={() => handleExportFiltered('pdf')}
             className="editorial-btn-primary"
             style={{ fontSize: '0.74rem', padding: '0.42rem 0.72rem' }}
@@ -467,7 +572,7 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
           </button>
           <button
             type="button"
-            disabled={exportingFormat !== null || filteredRows.length === 0}
+            disabled={exportingFormat !== null || paginatedRows.length === 0}
             onClick={() => handleExportFiltered('docx')}
             className="editorial-btn"
             style={{ fontSize: '0.74rem', padding: '0.42rem 0.72rem' }}
@@ -1085,9 +1190,9 @@ export const CapitalProjectsDirectory: React.FC<CapitalProjectsDirectoryProps> =
           }}
         >
           <span>
-            Showing {filteredRows.length === 0 ? 0 : (projectPage - 1) * PROJECTS_PER_PAGE + 1}–
-            {Math.min(projectPage * PROJECTS_PER_PAGE, filteredRows.length)} of{' '}
-            {filteredRows.length.toLocaleString('en-US')} matching projects
+            Showing {totalMatchingCount === 0 ? 0 : (projectPage - 1) * PROJECTS_PER_PAGE + 1}–
+            {Math.min(projectPage * PROJECTS_PER_PAGE, totalMatchingCount)} of{' '}
+            {totalMatchingCount.toLocaleString('en-US')} matching projects
           </span>
           <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
             <button
